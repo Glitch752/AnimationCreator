@@ -11,11 +11,14 @@
 
     --current-width: 1920px;
     --current-height: 1080px;
+
+    --background-color: #1c232b;
 }
 
 body {
     margin: 0;
     font-family: "Roboto";
+    overflow: hidden;
 }
 
 *,
@@ -75,7 +78,7 @@ body {
     height: calc(var(--current-scale) * var(--current-height));
     left: var(--current-offset-x);
     top: var(--current-offset-y);
-    background-color: #1c232b;
+    background-color: var(--background-color);
     box-shadow: 0 0 10px #000000;
 }
 
@@ -387,4 +390,95 @@ body {
 
 .outline:not(.shown) {
     display: none;
+}
+
+.right {
+    height: 100%;
+    float: right;
+    position: relative;
+}
+
+.button {
+    outline: none;
+    border: none;
+    background-color: #3569b8;
+    color: white;
+    padding: 5px 20px;
+    margin: 0;
+    height: 100%;
+    font-size: 20px;
+}
+.button:hover {
+    background-color: #537fc2;
+}
+.button:active {
+    background-color: #4f86d8;
+}
+
+.exportPopup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    width: 30rem;
+    right: 10px;
+    z-index: 2000;
+    background-color: #1f2227;
+    padding: 10px;
+}
+.exportPopup.shown {
+    display: block;
+}
+
+.exportPopup .section {
+    margin-bottom: 10px;
+    border-top: 1px solid #434d55;
+}
+
+.exportPopup .section .title {
+    font-size: 20px;
+    color: white;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.exportPopup .section .select {
+    background-color: #232830;
+    padding: 1px 0;
+}
+
+.exportPopup .section .option {
+    background-color: #303947;
+    margin: 5px;
+    padding: 0 5px;
+}
+.exportPopup .section .option:hover {
+    background-color: #353f50;
+    margin: 5px;
+}
+.exportPopup .section .option:active {
+    background-color: #374358;
+    margin: 5px;
+}
+.exportPopup .section .option.selected {
+    background-color: #374358;
+    margin: 5px;
+}
+
+.show {
+    display: none;
+}
+.show.shown {
+   display: block;
+}
+
+.centered {
+    text-align: center;
+}
+
+.exportCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
 }

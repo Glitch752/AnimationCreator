@@ -53,6 +53,19 @@ addGlobalListener("mousedown", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 
+    let target = e.target;
+    let clickedFrame = false;
+
+    while(target.parentElement) {
+        if(target.classList.contains("leftPanel")) {
+            clickedFrame = true;
+            break;
+        }
+        target = target.parentElement;
+    }
+
+    if(!clickedFrame) return;
+
     let selectedAddObject = getSelectedAddObject();
     if(selectedAddObject !== null) {
         deselectAddObject();
@@ -252,7 +265,7 @@ addGlobalListener("mousemove", (e) => {
         } else {
             let frame = document.getElementById("frame");
 
-            let lineSide = "bottomleft"
+            // let lineSide = "bottomleft"
 
             frame.innerHTML += `
                 <div class='object ${draggingObject} temp'
@@ -377,6 +390,7 @@ function regenerateSelectedListeners() {
 let selectedElement = false;
 
 function clickSelection(e) {
+    // Find what's wrong with this function
     if(draggingObject !== false) return;
 
     let selection = e.target;
@@ -386,7 +400,7 @@ function clickSelection(e) {
     setSelectionPosition(selection);
     selectionBoxDragDown(null);
 
-    e.stopImmediatePropagation();
+    // e.stopImmediatePropagation();
 }
 
 function setSelectionPosition(selection) {
@@ -396,6 +410,8 @@ function setSelectionPosition(selection) {
 
     let keybindHints = document.getElementById("keybindHints");
     keybindHints.classList.add("shown");
+
+    if(!selection) return;
 
     if(selection.dataset.objectType !== "line") {
         selectionBox.style.setProperty("--offsetX", selection.style.getPropertyValue("--offsetX"));
@@ -481,6 +497,8 @@ function loadObjects(objects) {
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height};"
             ></div>`;
     }
+    
+    regenerateSelectedListeners();
 }
 
 let objects = JSON.parse(localStorage.getItem("objects"));

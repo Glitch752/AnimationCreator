@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="styles.css">
     <script src="objectInteractions.js" defer></script>
     <script src="UI.js" defer></script>
+    <script src="export.js" defer></script>
+    <script src="ccapture.min.all.js" defer></script>
+    <!-- <script src="html2canvas.min.js" defer></script> -->
 
     <!-- <div id='debugger' style='font-size: 10px; z-index: 10000; position: absolute; bottom: 0; left: 0; width: 300px; height: 100px; background-color: #33333344; overflow-y: scroll; border-top: 1px solid #ffffff55; border-right: 1px solid #ffffff55;'></div><script type="text/javascript">const log = console.log.bind(console); console.log = (...args) => { logElem("white", ...args);}; const error = console.error.bind(console); console.error = (...args) => { logElem("red", ...args);}; function logElem(color, ...args) {var debuggerElem = document.getElementById('debugger');if(args.length===1)args=args[0];if(typeof args==='object')args=JSON.stringify(args);debuggerElem.innerHTML = debuggerElem.innerHTML.split("\n").slice(-100);debuggerElem.innerHTML += '<span style="color: ' + color + '; margin: 10px;"><span style="color: white">[' + Math.round(new Date().getTime() / 1000) + ']: </span>' + args + '</span><br>';if(debuggerElem.scrollTop > debuggerElem.scrollHeight - 500) debuggerElem.scrollTop = debuggerElem.scrollHeight;}</script> -->
 </head>
@@ -15,7 +18,48 @@
     <div class="header">
         <span>Animation creator</span>
         <div class="right">
-            <button class="share button">Share</button>
+            <button class="export button" onclick="exportAnimation()">Export</button>
+            <div id="exportPopup" class="exportPopup">
+                <div class="section">
+                    <span class="title">Resolution</span>
+                    <div class="select" id="resolution">
+                        <div class="option" data-width="640"  data-height="480" >SD  (640x480)  </div>
+                        <div class="option" data-width="1280" data-height="720" >HD  (1280x720) </div>
+                        <div class="option" data-width="1920" data-height="1080">FHD (1920x1080)</div>
+                        <div class="option" data-width="3840" data-height="2160">UHD (3840x2160)</div>
+                        <div class="option" data-custom="true" data-show-id="customResolution">Custom</div>
+                        <div class="show" id="customResolution">
+                            <input type="number" id="customWidth"  placeholder="Width" />
+                            <input type="number" id="customHeight" placeholder="Height"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <span class="title">Frame rate</span>
+                    <div class="select" id="frameRate">
+                        <div class="option" data-framerate="24">24</div>
+                        <div class="option" data-framerate="30">30</div>
+                        <div class="option" data-framerate="60">60</div>
+                        <div class="option" data-custom="true" data-show-id="customFrameRate">Custom</div>
+                        <div class="show" id="customFrameRate">
+                            <input type="number" id="customFrameRateInput" placeholder="Frame rate"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <span class="title">Export type</span>
+                    <div class="select" id="exportType">
+                        <div class="option" data-export-type="gif" >GIF                </div>
+                        <div class="option" data-export-type="webm">WEBM               </div>
+                        <div class="option" data-export-type="png" >PNG series (in tar)</div>
+                        <div class="option" data-export-type="jpg" >JPG series (in tar)</div>
+                    </div>
+                </div>
+                <div class="section">
+                    <div class="button export centered" onclick="runExport()">Export</div>
+                </div>
+            </div>
+            <button class="share  button" onclick="shareAnimation()">Share</button>
         </div>
     </div>
     <div class="body">

@@ -66,12 +66,12 @@ function updateObjectList() {
         object.setAttribute("data-index", i)
         let objectType = object.dataset.objectType;
         objectsList.innerHTML += `<div class="objectListItem ${(selectionDraggingDirection !== false && selectedElement == object) ? "selected" : ""}" 
-            onmouseenter="mouseEnterObjectList(this)" 
-            onmouseleave="mouseLeaveObjectList(this)"
-            onmousedown="mouseClickObjectList(this)"
+            onmouseenter ="mouseEnterObjectList(this)" 
+            onmouseleave ="mouseLeaveObjectList(this)"
+            onpointerdown="mouseClickObjectList(this)"
             data-index="${i}">
                 ${objectTypeNames[objectType] || "Unknown"}
-                ${/*<span class="objectListRemove" onmousedown="deleteObject(${i})">X</span>*/""}
+                <span class="objectListRemove" onpointerdown="deleteObject(${i})">X</span>
         </div>`;
 
         objectList.push({
@@ -85,6 +85,9 @@ function updateObjectList() {
     }
 
     localStorage.setItem("objects", JSON.stringify(objectList));
+    
+    // TODO: Add animations to localStorage
+    // localStorage.setItem("animations", JSON.stringify(objectList));
 }
 
 function deleteObject(index) {
@@ -92,7 +95,17 @@ function deleteObject(index) {
 
     originalObject.remove();
 
-    deselectAddObject();
+    hideSelectionBox();
+
+    mouseLeaveObjectList();
+
+    // Weird fix
+    // TODO: Make this less timing dependent
+    setTimeout(() => {
+        hideSelectionBox();
+
+        mouseLeaveObjectList();
+    }, 1);
 }
 
 function mouseEnterObjectList(e) {
@@ -111,7 +124,43 @@ function mouseLeaveObjectList(e) {
     let outline = document.getElementById("outline");
     outline.classList.remove("shown");
 }
+
 function mouseClickObjectList(e) {
     let originalObject = document.querySelector(`.object[data-index="${e.dataset.index}"]`);
+    if(!originalObject) return;
     clickSelection({target: originalObject});
+}
+
+function shareAnimation() {
+    // TODO: add sharing menu
+}
+
+let idShown = null;
+
+let options = document.querySelectorAll(".option");
+options.forEach(option => {
+    option.addEventListener("click", (e) => {
+        let siblingElements = option.parentElement.children;
+        for(var i = 0; i < siblingElements.length; i++) {
+            let siblingElement = siblingElements[i];
+            siblingElement.classList.remove("selected");
+        }
+        option.classList.add("selected");
+
+        if(idShown) {
+            document.getElementById(idShown).classList.remove("shown");
+            idShown = null;
+        }
+
+        if(option.dataset.showId) {
+            idShown = option.dataset.showId;
+            let element = document.getElementById(idShown);
+            element.classList.add("shown");
+        }
+    });
+});
+
+function exportAnimation() {
+    let exportPopup = document.getElementById("exportPopup");
+    exportPopup.classList.toggle("shown");
 }
