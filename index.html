@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation creator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="objectInteractions.js" defer></script>
+    <script src="UI.js" defer></script>
+
+    <!-- <div id='debugger' style='font-size: 10px; z-index: 10000; position: absolute; bottom: 0; left: 0; width: 300px; height: 100px; background-color: #33333344; overflow-y: scroll; border-top: 1px solid #ffffff55; border-right: 1px solid #ffffff55;'></div><script type="text/javascript">const log = console.log.bind(console); console.log = (...args) => { logElem("white", ...args);}; const error = console.error.bind(console); console.error = (...args) => { logElem("red", ...args);}; function logElem(color, ...args) {var debuggerElem = document.getElementById('debugger');if(args.length===1)args=args[0];if(typeof args==='object')args=JSON.stringify(args);debuggerElem.innerHTML = debuggerElem.innerHTML.split("\n").slice(-100);debuggerElem.innerHTML += '<span style="color: ' + color + '; margin: 10px;"><span style="color: white">[' + Math.round(new Date().getTime() / 1000) + ']: </span>' + args + '</span><br>';if(debuggerElem.scrollTop > debuggerElem.scrollHeight - 500) debuggerElem.scrollTop = debuggerElem.scrollHeight;}</script> -->
+</head>
+<body>
+    <div class="header">
+        <span>Animation creator</span>
+        <div class="right">
+            <button class="share button">Share</button>
+        </div>
+    </div>
+    <div class="body">
+        <div class="leftPanel" id="leftPanel">
+            <div class="frame" id="frame">
+                <div class="selectionBox" id="selectionBox">
+                    <div class="selectionBoxDragRegion" data-drag-region="topleft"     ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="top"         ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="topright"    ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="right"       ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="bottomright" ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="bottom"      ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="bottomleft"  ></div>
+                    <div class="selectionBoxDragRegion" data-drag-region="left"        ></div>
+                </div>
+                <div class="outline" id="outline"></div>
+            </div>
+            <div class="keybindHints" id="keybindHints">
+                <span><b>SHIFT:</b> Keep perfectly square</span>
+            </div>
+        </div>
+        <div class="rightPanel">
+            <div class="leftContainer">
+                <div class="leftContainerTab selected" data-tab="add">
+                    <div class="leftTabList">
+                        <div class="leftTabListItem">
+                            Shapes<span class="left">&gt;</span>
+                            <div data-sublist class="leftTabSubList">
+                                <div data-object="rectangle" class="leftTabSubListItem">Rectangle</div>
+                                <div data-object="circle" class="leftTabSubListItem">Circle</div>
+                                <div data-object="polygon" class="leftTabSubListItem">
+                                    Polygon<br>
+                                    <span>Sides:</span>
+                                    <input class="leftTabSubListItemRange" type="range" min="3" max="10" value="3" step="1" id="polygonSides" onInput="this.parentElement.children[3].innerText = this.value"/>
+                                    <span>3</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="leftTabListItem">
+                            Images<span class="left">&gt;</span>
+                            <div data-sublist class="leftTabSubList">
+                                <div data-object="imageClipboard" class="leftTabSubListItem">From clipboard</div>
+                                <!-- <div data-object="imageStock" class="leftTabSubListItem">Stock images</div> -->
+                            </div>
+                        </div>
+                        <!-- <div class="leftTabListItem">
+                            Custom<span class="left">&gt;</span>
+                            <div data-sublist class="leftTabSubList">
+                                <-- <div data-object="polyline" class="leftTabSubListItem">Polyline</div> --><!--
+                                <div data-object="line" class="leftTabSubListItem">Line</div>
+                                <-- <div data-object="bezierSequence" class="leftTabSubListItem">Bezier sequence</div> --><!--
+                                <-- <div data-object="text" class="leftTabSubListItem">Text</div> --><!--
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+                <div class="leftContainerTab" data-tab="timeline">Timeline</div>
+                <div class="leftContainerTab" data-tab="objects" id="objectsList"></div>
+            </div>
+            <div class="rightNavigation" id="rightNavigation">
+                <button class="rightNavigationButton selected" data-tab="add">
+                    <svg class="rightNavigationButtonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                        <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/>
+                    </svg>
+                    <div class="rightNavigationButtonLabel">Add</div>
+                </button>
+                <button class="rightNavigationButton" data-tab="timeline">
+                    <svg class="rightNavigationButtonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                        <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                        <path d="M128 120c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24zm32 49.3c28.3-12.3 48-40.5 48-73.3c0-44.2-35.8-80-80-80S48 51.8 48 96c0 32.8 19.7 61 48 73.3V224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H288v54.7c-28.3 12.3-48 40.5-48 73.3c0 44.2 35.8 80 80 80s80-35.8 80-80c0-32.8-19.7-61-48-73.3V288H608c17.7 0 32-14.3 32-32s-14.3-32-32-32H544V169.3c28.3-12.3 48-40.5 48-73.3c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 32.8 19.7 61 48 73.3V224H160V169.3zM536 96c0 13.3-10.7 24-24 24s-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24zM320 440c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/>
+                    </svg>
+                    <div class="rightNavigationButtonLabel">Timeline</div>
+                </button>
+                <button class="rightNavigationButton" data-tab="objects">
+                    <svg class="rightNavigationButtonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                        <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                        <path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/>
+                    </svg>
+                    <div class="rightNavigationButtonLabel">Objects</div>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

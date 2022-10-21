@@ -1,0 +1,390 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+:root {
+    --header-height: 2.2rem;
+    --right-panel-width: 20rem;
+    --right-panel-navigation-width: 3rem;
+
+    --current-scale: 0.5;
+    --current-offset-x: 0px;
+    --current-offset-y: 0px;
+
+    --current-width: 1920px;
+    --current-height: 1080px;
+}
+
+body {
+    margin: 0;
+    font-family: "Roboto";
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+.header {
+    height: var(--header-height);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    background-color: #383f47;
+    color: #fff;
+    font-size: calc(var(--header-height) - 0.6em);
+    padding: 0.1em 0.3em;
+}
+
+.body {
+    position: absolute;
+    top: var(--header-height);
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--header-height));
+    overflow: hidden;
+}
+
+.rightPanel {
+    display: inline-block;
+    position: absolute;
+    height: 100%;
+    width: var(--right-panel-width);
+}
+
+.leftPanel {
+    display: inline-block;
+    height: 100%;
+    width: calc(100% - var(--right-panel-width));
+    /* background-color: #1c232b; */
+    --color-1: #36363a;
+    --color-2: #282a2c;
+    background-image:
+        linear-gradient(45deg, var(--color-2) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--color-2) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--color-2) 75%),
+        linear-gradient(-45deg, var(--color-1) 75%, var(--color-2) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.frame {
+    display: inline-block;
+    position: absolute;
+    width: calc(var(--current-scale) * var(--current-width));
+    height: calc(var(--current-scale) * var(--current-height));
+    left: var(--current-offset-x);
+    top: var(--current-offset-y);
+    background-color: #1c232b;
+    box-shadow: 0 0 10px #000000;
+}
+
+.leftContainer {
+    position: absolute;
+    top: 0;
+    right: var(--right-panel-navigation-width);
+    width: calc(var(--right-panel-width) - var(--right-panel-navigation-width));
+    height: calc(100vh - var(--header-height));
+    background-color: #4f565e;
+}
+
+.rightNavigation {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--right-panel-navigation-width);
+    height: calc(100vh - var(--header-height));
+    background-color: #333b43;
+    display: flex;
+    flex-direction: column;
+}
+
+.rightNavigationButton {
+    height: var(--right-panel-navigation-width);
+    border: none;
+    outline: none;
+    background-color: #434d55;
+}
+
+.rightNavigationButton:hover {
+    height: var(--right-panel-navigation-width);
+    border: none;
+    outline: none;
+    background-color: #4a5259;
+    position: relative;
+}
+
+.rightNavigationButton.selected {
+    background-color: #4f565e;
+}
+
+.rightNavigationButtonLabel {
+    display: none;
+    position: absolute;
+    right: calc(100% + 1rem);
+    top: 0.1rem;
+    padding: 0.2rem 0.5rem;
+    background-color: #37383c;
+    color: white;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    color: #ffffff;
+}
+
+.rightNavigationButtonLabel::after {
+    --size: 0.5rem;
+    content: '';
+    position: absolute;
+    top: calc(0.5em - var(--size) / 2);
+    right: calc(var(--size) * -1);
+
+    width: 0;
+    height: 0;
+    border-top: var(--size) solid transparent;
+    border-bottom: var(--size) solid transparent;
+
+    border-left: var(--size) solid #37383c;
+}
+
+.rightNavigationButton:hover .rightNavigationButtonLabel {
+    display: inline-block;
+}
+
+.leftContainerTab {
+    display: none;
+}
+
+.leftContainerTab.selected {
+    display: block;
+}
+
+.leftTabList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.leftTabListItem {
+    background-color: #434d55;
+    width: 100%;
+    font-size: 1.5rem;
+    padding: 0.6rem;
+    color: white;
+}
+
+.leftTabListItem:hover {
+    background-color: #4a5259;
+}
+
+.leftTabListItem.selected {
+    background-color: #4f565e;
+}
+
+.leftTabSubList {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+}
+
+.leftTabListItem.open .leftTabSubList {
+    display: flex;
+}
+
+.leftTabSubListItem {
+    background-color: #434d55;
+    width: 100%;
+    font-size: 1.5rem;
+    padding: 0.6rem;
+    color: white;
+}
+
+.leftTabSubListItem:hover {
+    background-color: #4a5259;
+}
+
+.leftTabSubListItem.selected {
+    background-color: #4f565e;
+}
+
+
+.left {
+    float: right;
+}
+
+.leftTabSubListItem span {
+    font-size: 20px;
+}
+
+.object {
+    position: absolute;
+    left: calc(var(--offsetX) * var(--current-scale));
+    top: calc(var(--offsetY) * var(--current-scale));
+    width: calc(var(--width) * var(--current-scale));
+    height: calc(var(--height) * var(--current-scale));
+
+    --fill-color: #fff;
+
+    background-color: var(--fill-color);
+}
+.object.temp {
+    opacity: 0.3;
+}
+
+.object.circle {
+    border-radius: 50%;
+}
+.object[data-3-sides] {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.object[data-5-sides] {
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+.object[data-6-sides] {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+.object[data-7-sides] {
+    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+}
+.object[data-8-sides] {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+.object[data-9-sides] {
+    clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
+}
+.object[data-10-sides] {
+    clip-path: polygon(50% 0%, 80% 10%, 100% 35%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 0% 35%, 20% 10%);
+}
+
+.object.line {
+    --line-width: 10px;
+
+    width: calc(var(--size) * var(--current-scale));
+    height: var(--line-width);
+    transform-origin: 0% 0%;
+    transform: rotate(var(--rotation));
+}
+
+.selectionBox {
+    position: absolute;
+    left: calc(var(--offsetX) * var(--current-scale));
+    top: calc(var(--offsetY) * var(--current-scale));
+    width: calc(var(--width) * var(--current-scale));
+    height: calc(var(--height) * var(--current-scale));
+
+    --outline-color: #36789f;
+    --drag-region-color: #275a77;
+
+    z-index: 1000;
+
+    border: 5px solid var(--outline-color);
+}
+
+.selectionBox:not(.shown) {
+    display: none;
+}
+
+.selectionBoxDragRegion {
+    width: 15px;
+    height: 15px;
+    
+    background-color: var(--drag-region-color);
+
+    position: absolute;
+
+    transform: translate(-50%, -50%);
+
+    --outerEdge: 2px;
+}
+
+.selectionBoxDragRegion[data-drag-region="topleft"] {
+    top: calc(var(--outerEdge) * -1);
+    left: calc(var(--outerEdge) * -1);
+}
+.selectionBoxDragRegion[data-drag-region="top"] {
+    top: calc(var(--outerEdge) * -1);
+    left: 50%;
+}
+.selectionBoxDragRegion[data-drag-region="topright"] {
+    top: calc(var(--outerEdge) * -1);
+    left: calc(100% + var(--outerEdge));
+}
+.selectionBoxDragRegion[data-drag-region="left"] {
+    top: 50%;
+    left: calc(var(--outerEdge) * -1);
+}
+.selectionBoxDragRegion[data-drag-region="right"] {
+    top: 50%;
+    left: calc(100% + var(--outerEdge));
+}
+.selectionBoxDragRegion[data-drag-region="bottomleft"] {
+    top: calc(100% + var(--outerEdge));
+    left: calc(var(--outerEdge) * -1);
+}
+.selectionBoxDragRegion[data-drag-region="bottomright"] {
+    top: calc(100% + var(--outerEdge));
+    left: calc(100% + var(--outerEdge));
+}
+.selectionBoxDragRegion[data-drag-region="bottom"] {
+    top: calc(100% + var(--outerEdge));
+    left: 50%;
+}
+
+.keybindHints {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: white;
+    margin: 5px 10px;
+    font-size: 18px;
+    display: none;
+}
+.keybindHints.shown {
+    display: block;
+}
+
+.rightNavigationButtonIcon {
+    fill: #fff;
+}
+
+.objectListItem {
+    width: 100%;
+    padding: 5px;
+    background-color: #434d55;
+    color: white;
+    font-size: 24px;
+    position: relative;
+}
+.objectListItem:hover {
+    background-color: #4a5259;
+}
+.objectListItem.selected {
+    background-color: #4f565e;
+}
+.objectListRemove {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    font-size: 24px;
+    color: #f00;
+}
+.objectListRemove:hover {
+    color: #e66;
+}
+
+.outline {
+    position: absolute;
+    left: calc(var(--offsetX) * var(--current-scale));
+    top: calc(var(--offsetY) * var(--current-scale));
+    width: calc(var(--width) * var(--current-scale));
+    height: calc(var(--height) * var(--current-scale));
+
+    --outline-color: #36789f;
+
+    z-index: 999;
+
+    border: 5px solid var(--outline-color);
+}
+
+.outline:not(.shown) {
+    display: none;
+}
