@@ -164,3 +164,16 @@ function exportAnimation() {
     let exportPopup = document.getElementById("exportPopup");
     exportPopup.classList.toggle("shown");
 }
+
+// Settings menu
+function updateBackgroundColor(color) {
+    document.documentElement.style.setProperty("--background-color", color);
+    window.localStorage.setItem("backgroundColor", color);
+}
+
+let color = window.localStorage.getItem("backgroundColor");
+if(color) {
+    let colorInput = document.getElementById("backgroundColor");
+    colorInput.value = color;
+    updateBackgroundColor(color);
+}
