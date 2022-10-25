@@ -283,7 +283,7 @@ addGlobalListener("mousemove", (e) => {
             frame.innerHTML += `
                 <div class='object ${draggingObject} temp'
                     data-object-type="${draggingObject}"
-                    data-object-data="${draggingObject === "polygon" ? `${JSON.stringify(draggingObjectData)}` : ""}"
+                    data-object-data='${draggingObject === "polygon" ? `${JSON.stringify(draggingObjectData)}` : ""}'
                     ${draggingObject === "polygon" ? `data-${draggingObjectData.sides}-sides ` : ""}
                     ${draggingObject === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 ></div>`;
@@ -505,7 +505,7 @@ function loadObjects(objects) {
             <div class='object ${object.type}'
                 data-object-type="${object.type}"
                 data-object-data="${object.type === "polygon" ? `${JSON.stringify(object)}` : ""}"
-                ${object.type === "polygon" ? `data-${object.data.sides}-sides ` : ""}
+                ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height};"
             ></div>`;

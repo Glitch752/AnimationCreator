@@ -80,7 +80,7 @@ function updateObjectList() {
             y:      getComputedStyle(object).getPropertyValue("--offsetY"),
             width:  getComputedStyle(object).getPropertyValue("--width"  ),
             height: getComputedStyle(object).getPropertyValue("--height" ),
-            data:   object.getAttribute("data-object-data")
+            data:   JSON.parse(object.dataset.objectData || "{}")
         });
     }
 
