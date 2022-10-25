@@ -104,7 +104,7 @@ function renderFrame(time) {
 
                 let points = {
                     3: [
-                        [0, 0.5],
+                        [0.5, 0],
                         [0, 1],
                         [1, 1],
                     ],
@@ -173,23 +173,19 @@ function renderFrame(time) {
                     ]
                 };
 
-                let parsedData = JSON.parse(data);
-
-                let sides = parsedData.sides;
-
-                let pointsToDraw = points[sides];
+                let pointsToDraw = points[data.sides];
 
                 ctx.beginPath();
                 for(let i = 0; i < pointsToDraw.length; i++) {
                     let point = pointsToDraw[i];
 
-                    let x = parseFloat(x) + parseFloat(width) * point[0];
-                    let y = parseFloat(y) + parseFloat(height) * point[1];
+                    let nX = parseFloat(x) + parseFloat(width)  * point[0];
+                    let nY = parseFloat(y) + parseFloat(height) * point[1];
 
                     if(i === 0) {
-                        ctx.moveTo(x, y);
+                        ctx.moveTo(nX, nY);
                     } else {
-                        ctx.lineTo(x, y);
+                        ctx.lineTo(nX, nY);
                     }
                 }
                 ctx.closePath();

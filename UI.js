@@ -74,13 +74,16 @@ function updateObjectList() {
                 <span class="objectListRemove" onpointerdown="deleteObject(${i})">X</span>
         </div>`;
 
+        let objectData = object.dataset.objectData;
+        if(!objectData || objectData === "") objectData = "{}";
+
         objectList.push({
             type:   objectType,
             x:      getComputedStyle(object).getPropertyValue("--offsetX"),
             y:      getComputedStyle(object).getPropertyValue("--offsetY"),
             width:  getComputedStyle(object).getPropertyValue("--width"  ),
             height: getComputedStyle(object).getPropertyValue("--height" ),
-            data:   JSON.parse(object.dataset.objectData || "{}")
+            data:   JSON.parse(objectData)
         });
     }
 
