@@ -13,6 +13,19 @@ let selectionElementStartWidth = 0, selectionElementStartHeight = 0;
 const arrowChange = 100;
   
 addGlobalListener("wheel", (e) => {
+    let target = e.target;
+    let clickedFrame = false;
+
+    while(target.parentElement) {
+        if(target.classList.contains("leftPanel")) {
+            clickedFrame = true;
+            break;
+        }
+        target = target.parentElement;
+    }
+
+    if(!clickedFrame) return;
+    
     let currentScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
     
     let oldScale = currentScale;

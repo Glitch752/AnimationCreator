@@ -155,6 +155,7 @@ body {
 
 .leftContainerTab {
     display: none;
+    position: relative;
 }
 
 .leftContainerTab.selected {
@@ -481,4 +482,39 @@ body {
     left: 0;
     width: 100%;
     height: auto;
+}
+
+.settings .label {
+    color: white;
+}
+
+.timeline {
+    position: absolute;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    top: 0;
+    left: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    color: white;
+}
+
+.timeline-column {
+    width: 40px;
+    height: 100%;
+    display: inline-block;
+}
+
+.timeline-column-line {
+    width: 3px;
+    height: 100%;
+    background-color: #5dadee;
+    position: absolute;
+    top: 0;
+}
+
+.timeline-column-header {
+    position: sticky;
+    top: 0;
 }

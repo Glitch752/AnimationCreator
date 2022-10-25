@@ -85,6 +85,8 @@ function updateObjectList() {
     }
 
     localStorage.setItem("objects", JSON.stringify(objectList));
+
+    refreshTimeline(objectList);
     
     // TODO: Add animations to localStorage
     // localStorage.setItem("animations", JSON.stringify(objectList));
