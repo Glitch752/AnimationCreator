@@ -498,12 +498,21 @@ body {
     display: flex;
     flex-direction: row;
     color: white;
+
+    /* Make the scrollbars invisible */
+    scrollbar-width: none;
 }
+.timeline::-webkit-scrollbar {
+    display: none;
+}   
 
 .timeline-column {
     width: 40px;
     height: 100%;
     display: inline-block;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
 
 .timeline-column-line {
@@ -517,4 +526,29 @@ body {
 .timeline-column-header {
     position: sticky;
     top: 0;
+}
+
+.timeline-column-time {
+    width: 60px;
+}
+.timeline-column-time {
+    flex-wrap: wrap;
+}
+
+.timeline-column-dark-row {
+    background-color: #434a50;
+    z-index: 0;
+    height: 18px;
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+.timeline-text {
+    z-index: 100;
+    isolation: isolate;
+}
+.timeline-column-body {
+    position: absolute;
+    left: 0;
+    width: 100%;
 }
