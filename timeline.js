@@ -17,20 +17,31 @@ function refreshTimeline(objects) {
                     </div>`;
             } else {
                 times += `
-                    <div class="timeline-column-body-time">${getformattedTime(i, j)}</div>`;
+                    <div class="timeline-column-body-time timeline-text">${getformattedTime(i, j)}</div>`;
             }
         }
     }
 
+    let headers = ``;
+    for(let i = 0; i < objects.length; i++) {
+        headers += `
+            <div class="timeline-column-header">
+                <div class="timeline-column-header-title">${i}</div>
+            </div>
+        `;
+    }
+
     timeline.innerHTML = `
         <div class="timeline-marker" id="timelineMarker" onpointerdown="mouseDownTimeline()"></div>
-        <!-- Time column -->
-        <div class="timeline-column timeline-column-time">
-            <div class="timeline-column-header">
+        <div class="timeline-headers">
+            <div class="timeline-column-header timeline-column-header-time">
                 <div class="timeline-column-header-title">Time</div>
             </div>
+            ${headers}
+        </div>
+        <!-- Time column -->
+        <div class="timeline-column timeline-column-time">
             <div class="timeline-column-body" id="timelineColumnTimes">
-                <br />
                 ${times}
             </div>
         </div>
@@ -41,9 +52,6 @@ function refreshTimeline(objects) {
         
         timeline.innerHTML += `
             <div class="timeline-column">
-                <div class="timeline-column-header">
-                    <div class="timeline-column-header-title">${i}</div>
-                </div>
                 <div class="timeline-column-line">
                     <div class="timeline-column-line-marker" style="--height: 3"></div>
                     <div class="timeline-column-line-marker" style="--height: 1"></div>
@@ -52,6 +60,10 @@ function refreshTimeline(objects) {
             </div>
         `;
     }
+
+    console.log(timeline.scrollHeight);
+    timeline.style.setProperty("--width", timeline.scrollWidth + "px");
+    timeline.style.setProperty("--height", timeline.scrollHeight + "px");
 }
 
 function mouseDownTimeline() {
