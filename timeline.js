@@ -1,3 +1,7 @@
+let timelineDragStart = null;
+let timelineDragStartPosition = null;
+let draggingTimeline = false;
+
 function refreshTimeline(objects) {
     let timeline = document.getElementById("timeline");
 
@@ -32,7 +36,6 @@ function refreshTimeline(objects) {
     }
 
     timeline.innerHTML = `
-        <div class="timeline-marker" id="timelineMarker" onpointerdown="mouseDownTimeline()"></div>
         <div class="timeline-headers">
             <div class="timeline-column-header timeline-column-header-time">
                 <div class="timeline-column-header-title">Time</div>
@@ -52,22 +55,55 @@ function refreshTimeline(objects) {
         
         timeline.innerHTML += `
             <div class="timeline-column">
-                <div class="timeline-column-line">
-                    <div class="timeline-column-line-marker" style="--height: 3"></div>
+                <div class="timeline-column-line ${(selectionDraggingDirection !== false && selectedElement == object) ? "selected" : ""}">
                     <div class="timeline-column-line-marker" style="--height: 1"></div>
-                    <div class="timeline-column-line-marker" style="--height: 4"></div>
+                    <div class="timeline-column-line-marker" style="--height: 3"></div>
+                    <div class="timeline-column-line-marker" style="--height: 7"></div>
                 </div>
             </div>
         `;
     }
 
-    console.log(timeline.scrollHeight);
     timeline.style.setProperty("--width", timeline.scrollWidth + "px");
     timeline.style.setProperty("--height", timeline.scrollHeight + "px");
 }
 
-function mouseDownTimeline() {
-    
+let timelineDrag = document.getElementById("timelineDrag");
+timelineDrag.addEventListener("pointerdown", mouseDownTimeline);
+
+function mouseDownTimeline(e) {
+    timelineDragStart = e.clientY;
+    draggingTimeline = true;
+
+    let timelineMarker = document.getElementById("timelineMarker");
+    timelineDragStartPosition = parseFloat(timelineMarker.style.getPropertyValue("--distance")) || 0;
+
+    e.preventDefault();
+}
+
+addGlobalListener("mousemove", function(e) {
+    if(draggingTimeline) {
+        let currentY = e.clientY;
+        let difference = currentY - timelineDragStart;
+        let distance = timelineDragStartPosition + difference;
+
+        console.log(distance);
+        
+        let timelineMarker = document.getElementById("timelineMarker");
+        timelineMarker.style.setProperty("--distance", distance + "px");
+        
+        e.preventDefault();
+    }
+});
+
+addGlobalListener("mouseup", function(e) {
+    timelineDragStart = null;
+    draggingTimeline = false;
+});
+
+function updateTimelineScroll() {
+    let timelineMarker = document.getElementById("timelineMarker");
+    timelineMarker.style.setProperty("--scroll", document.getElementById("timeline").scrollTop + "px");
 }
 
 function getformattedTime(minutes, seconds) {

@@ -531,6 +531,10 @@ body {
     top: 0;
 }
 
+.timeline-column-line.selected {
+    background-color: #9cd2ff;
+}
+
 .timeline-headers {
     position: sticky;
     top: 0;
@@ -571,4 +575,39 @@ body {
     position: absolute;
     left: 0;
     width: 100%;
+}
+
+.timeline-marker {
+    position: absolute;
+    width: calc(100% + 10px);
+    height: 3px;
+    background-color: #5dadee88;
+    z-index: 10;
+    left: -10px;
+    top: calc(var(--distance, 0px) - var(--scroll, 0px));
+}
+.timeline-marker .drag {
+    display: inline-block;
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background-color: #5dadee;
+    z-index: 10;
+    opacity: 1;
+    left: -10px;
+    top: -6px;
+    border-radius: 50%;
+}
+.timeline-marker .drag:hover {
+    background-color: #9cd2ff;
+}
+
+.timeline-column-line-marker {
+    position: absolute;
+    background-color: orange;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    left: -2px;
+    top: calc(var(--height) * 19px + 20px);
 }

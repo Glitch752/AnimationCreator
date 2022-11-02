@@ -119,7 +119,10 @@
                     <label for="backgroundColor" class="label">Background color</label>
                 </div>
                 <div class="leftContainerTab" data-tab="timeline">
-                    <div class="timeline" id="timeline"></div>
+                    <div class="timeline" id="timeline" onscroll="updateTimelineScroll()"></div>
+                    <div class="timeline-marker" id="timelineMarker">
+                        <div class="drag" id="timelineDrag"></div>
+                    </div>
                 </div>
                 <div class="leftContainerTab" data-tab="objects" id="objectsList"></div>
             </div>
