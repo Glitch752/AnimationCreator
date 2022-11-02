@@ -506,6 +506,7 @@ function loadObjects(objects) {
             <div class='object ${object.type}'
                 data-object-type="${object.type}"
                 data-object-data='${object.type === "polygon" ? `${JSON.stringify(object.data)}` : ""}'
+                data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
                 ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height};"

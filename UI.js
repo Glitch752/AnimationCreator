@@ -77,22 +77,23 @@ function updateObjectList() {
         let objectData = object.dataset.objectData;
         if(!objectData || objectData === "") objectData = "{}";
 
+        let objectKeyframes = object.dataset.keyframes;
+        if(!objectKeyframes || objectKeyframes === "") objectKeyframes = "[]";
+
         objectList.push({
             type:   objectType,
             x:      getComputedStyle(object).getPropertyValue("--offsetX"),
             y:      getComputedStyle(object).getPropertyValue("--offsetY"),
             width:  getComputedStyle(object).getPropertyValue("--width"  ),
             height: getComputedStyle(object).getPropertyValue("--height" ),
-            data:   JSON.parse(objectData)
+            data:   JSON.parse(objectData),
+            keyframes: JSON.parse(objectKeyframes)
         });
     }
 
     localStorage.setItem("objects", JSON.stringify(objectList));
 
     refreshTimeline(objects);
-    
-    // TODO: Add animations to localStorage
-    // localStorage.setItem("animations", JSON.stringify(objectList));
 }
 
 function deleteObject(index) {

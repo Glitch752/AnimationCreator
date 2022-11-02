@@ -52,13 +52,23 @@ function refreshTimeline(objects) {
 
     for (let i = 0; i < objects.length; i++) {
         const object = objects[i];
+
+        let markers = ``;
+
+        let keyframes = JSON.parse(object.dataset.keyframes || "[]");
+
+        for(let j = 0; j < keyframes.length; j++) {
+            const marker = keyframes[j];
+
+            markers += `
+                <div class="timeline-column-line-marker" style="--height: ${marker.time}"></div>
+            `;
+        }
         
         timeline.innerHTML += `
             <div class="timeline-column">
                 <div class="timeline-column-line ${(selectionDraggingDirection !== false && selectedElement == object) ? "selected" : ""}">
-                    <div class="timeline-column-line-marker" style="--height: 1"></div>
-                    <div class="timeline-column-line-marker" style="--height: 3"></div>
-                    <div class="timeline-column-line-marker" style="--height: 7"></div>
+                    ${markers}
                 </div>
             </div>
         `;
@@ -86,8 +96,6 @@ addGlobalListener("mousemove", function(e) {
         let currentY = e.clientY;
         let difference = currentY - timelineDragStart;
         let distance = timelineDragStartPosition + difference;
-
-        console.log(distance);
         
         let timelineMarker = document.getElementById("timelineMarker");
         timelineMarker.style.setProperty("--distance", distance + "px");
@@ -109,3 +117,30 @@ function updateTimelineScroll() {
 function getformattedTime(minutes, seconds) {
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`.trim();
 }
+
+addGlobalListener("keydown", function(e) {
+    if(e.key === "k") {
+        console.log(e.key);
+        // Add a keyframe to the currently selected element
+        if(selectedElement !== null) {
+            let currentKeyframes = selectedElement.dataset.keyframes;
+            if(currentKeyframes === undefined) currentKeyframes = "[]";
+            currentKeyframes = JSON.parse(currentKeyframes);
+
+            let currentTime = (parseFloat(document.getElementById("timelineMarker").style.getPropertyValue("--distance")) - 20) / 19;
+            currentKeyframes.push({
+                time: currentTime,
+                data: {
+                    x: selectedElement.style.getPropertyValue("--offsetX"),
+                    y: selectedElement.style.getPropertyValue("--offsetY"),
+                    width: selectedElement.style.getPropertyValue("--width"),
+                    height: selectedElement.style.getPropertyValue("--height")
+                }
+            });
+
+            selectedElement.dataset.keyframes = JSON.stringify(currentKeyframes);
+
+            updateObjectList();
+        }
+    }
+});
