@@ -16,6 +16,12 @@ function selectTab(button) {
     oldTabElement.classList.remove("selected");
     tabElement.classList.add("selected");
 
+    if(tab === "timeline") {
+        let timeline = document.getElementById("timeline");
+        timeline.style.setProperty("--width", timeline.scrollWidth + "px");
+        timeline.style.setProperty("--height", timeline.scrollHeight + "px");
+    }
+
     oldButtonElement.classList.remove("selected");
     button.classList.add("selected");
 }

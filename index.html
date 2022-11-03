@@ -114,9 +114,11 @@
                         </div>-->
                     </div>
                 </div>
-                <div class="leftContainerTab" data-tab="settings" id="settings">
+                <div class="leftContainerTab settings" data-tab="settings" id="settings">
                     <input id="backgroundColor" type="color" value="#1c232b" onchange="updateBackgroundColor(this.value)"/>
                     <label for="backgroundColor" class="label">Background color</label>
+                    <input id="duration" type="number" value="1" min="0.1" step="0.1" onchange="updateDuration(this.value)"/>
+                    <label for="duration" class="label">Duration (seconds)</label>
                 </div>
                 <div class="leftContainerTab" data-tab="timeline">
                     <div class="timeline" id="timeline" onscroll="updateTimelineScroll()"></div>

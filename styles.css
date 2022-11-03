@@ -485,6 +485,21 @@ body {
     height: auto;
 }
 
+.settings {
+    margin: 5px;
+}
+
+.settings input[type="color"] {
+    width: 30px;
+    height: 20px;
+}
+.settings input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.settings input[type="color"]::-webkit-color-swatch {
+	border: none;
+}
+
 .settings .label {
     color: white;
 }

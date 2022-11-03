@@ -2,17 +2,21 @@ let timelineDragStart = null;
 let timelineDragStartPosition = null;
 let draggingTimeline = false;
 
+let totalMinutes = localStorage.getItem("duration") || 2;
+
 function refreshTimeline(objects) {
     let timeline = document.getElementById("timeline");
 
     let times = "";
-    let totalMinutes = 2;
 
     for (let i = 0; i < totalMinutes; i++) {
-        let minutes = i;
-        let seconds = 0;
+        let seconds = 60;
+        console.log(i)
+        if(i === Math.ceil(totalMinutes) - 1) {
+            seconds = (totalMinutes - i) * 60;
+        }
 
-        for(let j = i === 0 ? 1 : 0; j < 60; j++) {
+        for(let j = i === 0 ? 1 : 0; j < seconds; j++) {
             if(j % 2 === 1) {
                 times += `
                     <div class="timeline-column-body-time">
@@ -144,3 +148,11 @@ addGlobalListener("keydown", function(e) {
         }
     }
 });
+
+function updateDuration() {
+    let duration = document.getElementById("duration");
+    totalMinutes = (parseFloat(duration.value) + 1) / 60;
+    updateObjectList();
+
+    localStorage.setItem("duration", totalMinutes);
+}
