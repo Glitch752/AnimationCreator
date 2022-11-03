@@ -65,7 +65,7 @@ function refreshTimeline(objects) {
             const marker = keyframes[j];
 
             markers += `
-                <div class="timeline-column-line-marker" style="--height: ${marker.time}"></div>
+                <div class="timeline-column-line-marker" style="--height: ${marker.time}" onpointerdown="clickMarker(this)"></div>
             `;
         }
         
@@ -100,9 +100,15 @@ addGlobalListener("mousemove", function(e) {
         let currentY = e.clientY;
         let difference = currentY - timelineDragStart;
         let distance = timelineDragStartPosition + difference;
+
+        distance = Math.max(0, distance);
+        let timelineHeight = document.getElementById("timelineColumnTimes").scrollHeight;
+        distance = Math.min(timelineHeight, distance);
         
         let timelineMarker = document.getElementById("timelineMarker");
         timelineMarker.style.setProperty("--distance", distance + "px");
+
+        updateElementPositions(distance / 19 + 1);
         
         e.preventDefault();
     }
@@ -131,7 +137,7 @@ addGlobalListener("keydown", function(e) {
             if(currentKeyframes === undefined) currentKeyframes = "[]";
             currentKeyframes = JSON.parse(currentKeyframes);
 
-            let currentTime = (parseFloat(document.getElementById("timelineMarker").style.getPropertyValue("--distance")) - 20) / 19;
+            let currentTime = (parseFloat(document.getElementById("timelineMarker").style.getPropertyValue("--distance")) - 15) / 19;
             currentKeyframes.push({
                 time: currentTime,
                 data: {
@@ -155,4 +161,74 @@ function updateDuration() {
     updateObjectList();
 
     localStorage.setItem("duration", totalMinutes);
+}
+
+function updateElementPositions(time) {
+    let elements = document.getElementsByClassName("object");
+    for(let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        let keyframes = JSON.parse(element.dataset.keyframes || "[]");
+
+        let previousKeyframe = null;
+        let nextKeyframe = null;
+
+        for(let j = 0; j < keyframes.length; j++) {
+            const keyframe = keyframes[j];
+            if(keyframe.time <= time) {
+                previousKeyframe = keyframe;
+            } else {
+                nextKeyframe = keyframe;
+                break;
+            }
+        }
+
+        if(previousKeyframe === null) {
+            previousKeyframe = {
+                time: 0,
+                data: { x: 0, y: 0, width: 0, height: 0 }
+            }
+        }
+        
+        if(nextKeyframe === null) {
+            element.style.setProperty("--offsetX", previousKeyframe.data.x);
+            element.style.setProperty("--offsetY", previousKeyframe.data.y);
+            element.style.setProperty("--width", previousKeyframe.data.width);
+            element.style.setProperty("--height", previousKeyframe.data.height);
+        } else {
+            let difference = nextKeyframe.time - previousKeyframe.time;
+            let progress = (time - previousKeyframe.time) / difference;
+
+            let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress);
+            let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress);
+            let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress);
+            let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress);
+
+            element.style.setProperty("--offsetX", x + "px");
+            element.style.setProperty("--offsetY", y + "px");
+            element.style.setProperty("--width", width + "px");
+            element.style.setProperty("--height", height + "px");
+        }
+    }
+}
+
+function interpolate(a, b, t, ease = "ease-in-out") {
+    if(ease === "linear") {
+        return a + (b - a) * t;
+    } else if(ease === "ease-in-out") {
+        return a + (b - a) * easeInOut(t);
+    } else if(ease === "ease-in") {
+        return a + (b - a) * easeIn(t);
+    } else if(ease === "ease-out") {
+        return a + (b - a) * easeOut(t);
+    }
+}
+
+function easeInOut(time) {
+    return time < 0.5 ? 2 * time * time : -1 + (4 - 2 * time) * time;
+}
+function easeIn(time) {
+    return time * time;
+}
+function easeOut(time) {
+    return time * (2 - time);
 }

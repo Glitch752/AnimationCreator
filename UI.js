@@ -189,3 +189,9 @@ if(color) {
     colorInput.value = color;
     updateBackgroundColor(color);
 }
+
+let duration = window.localStorage.getItem("duration");
+if(duration) {
+    let durationInput = document.getElementById("duration");
+    durationInput.value = duration * 60 - 1;
+}
