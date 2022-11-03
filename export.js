@@ -24,6 +24,8 @@ function runExport() {
         fps = fpsElement.dataset.framerate;
     }
 
+    framerate = fps;
+
     // alert(`Exporting animation with the following settings:
     // Export Type: ${exportType}
     // Resolution: ${width}x${height}
@@ -72,6 +74,8 @@ function renderFrame(time) {
     // console.log(seconds);
     
     let objects = JSON.parse(localStorage.getItem("objects"));
+    objects = getPositionsFromKeyframes(objects, seconds);
+
     for (let i = 0; i < objects.length; i++) {
         const object = objects[i];
         
@@ -204,7 +208,7 @@ function renderFrame(time) {
     }
     
     frame++;
-    if(frame > 60) {
+    if(frame > (duration * 60 - 1) * framerate) {
         stopCapture();
         return;
     }
@@ -227,4 +231,53 @@ function createExportCanvas(width, height) {
     document.body.appendChild(canvas);
 
     return canvas;
+}
+
+function getPositionsFromKeyframes(objects, time) {
+    for(let i = 0; i < objects.length; i++) {
+        const object = objects[i];
+        let keyframes = object.keyframes || [];
+
+        let previousKeyframe = null;
+        let nextKeyframe = null;
+
+        for(let j = 0; j < keyframes.length; j++) {
+            const keyframe = keyframes[j];
+            if(keyframe.time <= time) {
+                previousKeyframe = keyframe;
+            } else {
+                nextKeyframe = keyframe;
+                break;
+            }
+        }
+
+        if(previousKeyframe === null) {
+            previousKeyframe = {
+                time: 0,
+                data: { x: 0, y: 0, width: 0, height: 0 }
+            }
+        }
+        
+        if(nextKeyframe === null) {
+            object.x =      previousKeyframe.data.x;
+            object.y =      previousKeyframe.data.y;
+            object.width =  previousKeyframe.data.width;
+            object.height = previousKeyframe.data.height;
+        } else {
+            let difference = nextKeyframe.time - previousKeyframe.time;
+            let progress = (time - previousKeyframe.time) / difference;
+
+            let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress);
+            let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress);
+            let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress);
+            let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress);
+
+            object.x = x;
+            object.y = y;
+            object.width = width;
+            object.height = height;
+        }
+    }
+
+    return objects;
 }
