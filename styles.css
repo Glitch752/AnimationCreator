@@ -293,6 +293,7 @@ body {
     height: 15px;
     
     background-color: var(--drag-region-color);
+    border: 1px solid var(--outline-color);
 
     position: absolute;
 
@@ -664,4 +665,34 @@ body {
 }
 .green:hover {
     background-color: #49a16e;
+}
+
+.play-button {
+    width: 15px;
+    height: 15px;
+    fill: #2b9457;
+    position: absolute;
+    margin: 5px;
+    top: 0;
+}
+.play-button:hover {
+    fill: #3dbd7d;
+}
+.play-button.hidden {
+    display: none;
+}
+
+.pause-button {
+    width: 15px;
+    height: 15px;
+    fill: #b03d3d;
+    position: absolute;
+    margin: 5px;
+    top: 0;
+}
+.pause-button:hover {
+    fill: #d13d3d;
+}
+.pause-button.hidden {
+    display: none;
 }

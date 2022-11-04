@@ -62,7 +62,8 @@ function updateObjectList() {
         "circle": "Circle",
         "polygon": "Polygon",
         "imageClipboard": "Image",
-        "line": "Line"
+        "line": "Line",
+        "text": "Text"
     };
 
     let objectList = [];

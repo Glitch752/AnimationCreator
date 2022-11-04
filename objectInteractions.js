@@ -95,6 +95,9 @@ addGlobalListener("mousedown", (e) => {
         if(selectedAddObject === "polygon") {
             draggingObjectData["sides"] = document.getElementById("polygonSides").value;
         }
+        if(selectedAddObject === "text") {
+            draggingObjectData["text"] = "Add text here...";
+        }
 
         return;
     }
@@ -449,6 +452,22 @@ function setSelectionPosition(selection) {
         selectionBox.style.setProperty("--width",   Math.abs(Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
         selectionBox.style.setProperty("--height",  Math.abs(Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
     }
+
+    if(markerSelected !== null) {
+        let newKeyframes = selection.dataset.keyframes || "[]";
+        newKeyframes = JSON.parse(newKeyframes);
+
+        console.log(newKeyframes);
+
+        newKeyframes[markerSelected.marker].data = {
+            "x": selection.style.getPropertyValue("--offsetX"),
+            "y": selection.style.getPropertyValue("--offsetY"),
+            "width": selection.style.getPropertyValue("--width"),
+            "height": selection.style.getPropertyValue("--height")
+        };
+
+        selection.dataset.keyframes = JSON.stringify(newKeyframes);
+    }
 }
 
 // let selectionBoxDragRegions = document.querySelectorAll(".selectionBoxDragRegion");
@@ -494,6 +513,8 @@ function hideSelectionBox() {
     let keybindHints = document.getElementById("keybindHints");
     keybindHints.classList.remove("shown");
 
+    selectedElement = false;
+
     updateObjectList();
 }
 
@@ -504,16 +525,22 @@ function loadObjects(objects) {
 
     for (let i = 0; i < objects.length; i++) {
         const object = objects[i];
+
+        const objectElementTypes = {
+            "text": "input"
+        };
+
+        let type = objectElementTypes[object.type] || "div";
         
         frame.innerHTML += `
-            <div class='object ${object.type}'
+            <${type} class='object ${object.type}'
                 data-object-type="${object.type}"
                 data-object-data='${object.type === "polygon" ? `${JSON.stringify(object.data)}` : ""}'
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
                 ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: ${object.color || "#ffffff"};"
-            ></div>`;
+            ></${type}>`;
     }
     
     regenerateSelectedListeners();
