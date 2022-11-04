@@ -54,7 +54,12 @@
                     </div>
                 </div>
                 <div class="section">
-                    <div class="button export centered" onclick="runExport()">Export</div>
+                    <div class="button bottom-margin export centered" onclick="runExport()">Export</div>
+                    <div class="button bottom-margin export centered green" onclick="copyJSON()">Copy JSON</div>
+                    <div class="half">
+                        <input class="half-inner json-input" type="text" id="JSONInput" placeholder="JSON" />
+                        <div class="half-inner button export centered green" onclick="loadJSON()">Load JSON</div>
+                    </div>
                 </div>
             </div>
             <button class="share  button" onclick="shareAnimation()">Share</button>

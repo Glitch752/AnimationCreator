@@ -636,3 +636,32 @@ body {
 .timeline-column-line-marker.selected {
     background-color: #ffdfa4;
 }
+
+.half {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+}
+.half-inner {
+    flex-grow: 1;
+}
+
+.bottom-margin {
+    margin-bottom: 10px;
+}
+
+.json-input {
+    border: none;
+    outline: none;
+    background-color: #353f50;
+    color: white;
+    font-size: 24px;
+}
+
+.green {
+    background-color: #3d835a;
+}
+.green:hover {
+    background-color: #49a16e;
+}

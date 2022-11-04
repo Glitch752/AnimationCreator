@@ -180,7 +180,7 @@ function exportAnimation() {
 // Settings menu
 function updateBackgroundColor(color) {
     document.documentElement.style.setProperty("--background-color", color);
-    window.localStorage.setItem("backgroundColor", color);
+    localStorage.setItem("backgroundColor", color);
 }
 
 let color = window.localStorage.getItem("backgroundColor");
@@ -194,4 +194,46 @@ let duration = window.localStorage.getItem("duration");
 if(duration) {
     let durationInput = document.getElementById("duration");
     durationInput.value = duration * 60 - 1;
+}
+
+function copyJSON() {
+    let json = {
+        backgroundColor: localStorage.getItem("backgroundColor"),
+        duration: localStorage.getItem("duration"),
+        objects: JSON.parse(localStorage.getItem("objects"))
+    };
+
+    let JSONText = JSON.stringify(json);
+
+    let textArea = document.createElement("textarea");
+    textArea.value = JSONText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+}
+
+function loadJSON() {
+    let JSONText = document.getElementById("JSONInput").value;
+    let JSON = null;
+
+    try {
+        JSON = JSON.parse(JSONText);
+    } catch(e) {
+        console.error("Invalid JSON");
+        exportAnimation();
+        return;
+    }
+
+    if(!JSON.backgroundColor || !JSON.duration || !JSON.objects) {
+        console.error("Invalid JSON");
+        exportAnimation();
+        return;
+    }
+
+    localStorage.setItem("backgroundColor", JSON.backgroundColor);
+    localStorage.setItem("duration", JSON.duration);
+    localStorage.setItem("objects", JSON.objects);
+
+    location.reload();
 }
