@@ -215,25 +215,25 @@ function copyJSON() {
 
 function loadJSON() {
     let JSONText = document.getElementById("JSONInput").value;
-    let JSON = null;
+    let JSONData = null;
 
     try {
-        JSON = JSON.parse(JSONText);
+        JSONData = JSON.parse(JSONText);
     } catch(e) {
+        console.error("Invalid JSON", e);
+        exportAnimation();
+        return;
+    }
+
+    if(!JSONData.backgroundColor || !JSONData.duration || !JSONData.objects) {
         console.error("Invalid JSON");
         exportAnimation();
         return;
     }
 
-    if(!JSON.backgroundColor || !JSON.duration || !JSON.objects) {
-        console.error("Invalid JSON");
-        exportAnimation();
-        return;
-    }
-
-    localStorage.setItem("backgroundColor", JSON.backgroundColor);
-    localStorage.setItem("duration", JSON.duration);
-    localStorage.setItem("objects", JSON.objects);
+    localStorage.setItem("backgroundColor", JSONData.backgroundColor);
+    localStorage.setItem("duration", JSONData.duration);
+    localStorage.setItem("objects", JSON.stringify(JSONData.objects));
 
     location.reload();
 }
