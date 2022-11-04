@@ -4,14 +4,19 @@ let draggingTimeline = false;
 
 let totalMinutes = localStorage.getItem("duration") || 2;
 
+let markerSelected = null;
+
+let lastObjects = [];
+
 function refreshTimeline(objects) {
+    lastObjects = objects;
+
     let timeline = document.getElementById("timeline");
 
     let times = "";
 
     for (let i = 0; i < totalMinutes; i++) {
         let seconds = 60;
-        console.log(i)
         if(i === Math.ceil(totalMinutes) - 1) {
             seconds = (totalMinutes - i) * 60;
         }
@@ -34,7 +39,7 @@ function refreshTimeline(objects) {
     for(let i = 0; i < objects.length; i++) {
         headers += `
             <div class="timeline-column-header">
-                <div class="timeline-column-header-title">${i}</div>
+                <div class="timeline-column-header-title" onpointerdown="clickObjectHeader(${i})">${i}</div>
             </div>
         `;
     }
@@ -65,7 +70,7 @@ function refreshTimeline(objects) {
             const marker = keyframes[j];
 
             markers += `
-                <div class="timeline-column-line-marker" style="--height: ${marker.time}" onpointerdown="clickMarker(this)"></div>
+                <div class="timeline-column-line-marker ${(markerSelected !== null && i === markerSelected.object && j === markerSelected.marker) ? "selected" : ""}" style="--height: ${marker.time}" onpointerdown="mouseDownMarker(${i}, ${j})"></div>
             `;
         }
         
@@ -108,7 +113,7 @@ addGlobalListener("mousemove", function(e) {
         let timelineMarker = document.getElementById("timelineMarker");
         timelineMarker.style.setProperty("--distance", distance + "px");
 
-        updateElementPositions(distance / 19 + 1);
+        updateElementPositions(distance / 19);
         
         e.preventDefault();
     }
@@ -129,31 +134,57 @@ function getformattedTime(minutes, seconds) {
 }
 
 addGlobalListener("keydown", function(e) {
-    if(e.key === "k") {
-        console.log(e.key);
-        // Add a keyframe to the currently selected element
-        if(selectedElement !== null) {
-            let currentKeyframes = selectedElement.dataset.keyframes;
-            if(currentKeyframes === undefined) currentKeyframes = "[]";
-            currentKeyframes = JSON.parse(currentKeyframes);
+    switch(e.key) {
+        case "k": {
+            // Add a keyframe to the currently selected element
+            if(selectedElement !== null) {
+                let currentKeyframes = selectedElement.dataset.keyframes;
+                if(currentKeyframes === undefined) currentKeyframes = "[]";
+                currentKeyframes = JSON.parse(currentKeyframes);
 
-            let currentTime = (parseFloat(document.getElementById("timelineMarker").style.getPropertyValue("--distance")) - 15) / 19;
-            currentKeyframes.push({
-                time: currentTime,
-                data: {
-                    x: selectedElement.style.getPropertyValue("--offsetX"),
-                    y: selectedElement.style.getPropertyValue("--offsetY"),
-                    width: selectedElement.style.getPropertyValue("--width"),
-                    height: selectedElement.style.getPropertyValue("--height")
-                }
-            });
+                let currentTime = (parseFloat(document.getElementById("timelineMarker").style.getPropertyValue("--distance"))) / 19;
+                if(!currentTime) currentTime = 0;
 
-            selectedElement.dataset.keyframes = JSON.stringify(currentKeyframes);
+                currentKeyframes.push({
+                    time: currentTime,
+                    data: {
+                        x: selectedElement.style.getPropertyValue("--offsetX"),
+                        y: selectedElement.style.getPropertyValue("--offsetY"),
+                        width: selectedElement.style.getPropertyValue("--width"),
+                        height: selectedElement.style.getPropertyValue("--height")
+                    }
+                });
 
-            updateObjectList();
+                selectedElement.dataset.keyframes = JSON.stringify(currentKeyframes);
+
+                updateObjectList();
+            }
+            break;
+        }
+        case "Delete":
+        case "Backspace": {
+            if(markerSelected !== null) {
+                let currentKeyframes = lastObjects[markerSelected.object].dataset.keyframes;
+                if(currentKeyframes === undefined) currentKeyframes = "[]";
+                currentKeyframes = JSON.parse(currentKeyframes);
+
+                currentKeyframes.splice(markerSelected.marker, 1);
+
+                lastObjects[markerSelected.object].dataset.keyframes = JSON.stringify(currentKeyframes);
+
+                markerSelected = null;
+                updateObjectList();
+            }
+            break;
         }
     }
 });
+
+function clickObjectHeader(index) {
+    let originalObject = document.querySelector(`.object[data-index="${index}"]`);
+    if(!originalObject) return;
+    clickSelection({target: originalObject});
+}
 
 function updateDuration() {
     let duration = document.getElementById("duration");
@@ -185,7 +216,12 @@ function updateElementPositions(time) {
         if(previousKeyframe === null) {
             previousKeyframe = {
                 time: 0,
-                data: { x: 0, y: 0, width: 0, height: 0 }
+                data: { 
+                    x: getComputedStyle(element).getPropertyValue("--offsetX"),
+                    y: getComputedStyle(element).getPropertyValue("--offsetY"),
+                    width: getComputedStyle(element).getPropertyValue("--width"),
+                    height: getComputedStyle(element).getPropertyValue("--height")
+                }
             }
         }
         
@@ -231,4 +267,11 @@ function easeIn(time) {
 }
 function easeOut(time) {
     return time * (2 - time);
+}
+
+function mouseDownMarker(object, marker) {
+    markerSelected = {
+        object: object,
+        marker: marker
+    };
 }

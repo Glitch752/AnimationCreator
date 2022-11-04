@@ -1,42 +1,45 @@
 let capturer = null;
 
 function runExport() {
-    let exportType = document.querySelector(".select#exportType .selected").dataset.exportType;
+    let exportType = document.querySelector(".select#exportType .selected")?.dataset?.exportType;
     let resolutionElement = document.querySelector(".select#resolution .selected");
 
     let width = null, height = null;
 
-    if(resolutionElement.dataset.custom === "true") {
+    if(resolutionElement?.dataset?.custom === "true") {
         width = document.getElementById("customWidth").value;
         height = document.getElementById("customHeight").value;
     } else {
-        width = resolutionElement.dataset.width;
-        height = resolutionElement.dataset.height;
+        width = resolutionElement?.dataset?.width;
+        height = resolutionElement?.dataset?.height;
     }
 
     let fpsElement = document.querySelector(".select#frameRate .selected");
 
     let fps = null;
 
-    if(fpsElement.dataset.custom === "true") {
+    if(fpsElement?.dataset?.custom === "true") {
         fps = document.getElementById("customFrameRateInput").value;
     } else {
-        fps = fpsElement.dataset.framerate;
+        fps = fpsElement?.dataset?.framerate;
+    }
+
+    exportAnimation();
+
+    // TODO: Add an actual error message for the user
+    if(!width || !height || !fps || !exportType) {
+        console.error("Invalid export settings");
+        return;
     }
 
     framerate = fps;
-
-    // alert(`Exporting animation with the following settings:
-    // Export Type: ${exportType}
-    // Resolution: ${width}x${height}
-    // Frame Rate: ${fps}`);
 
     createExportCanvas(width, height);
 
     capturer = new CCapture({
         format: exportType,
         framerate: fps,
-        verbose: true,
+        verbose: false,
         name: "animation",
         quality: 100,
         // workersPath: "js/",
@@ -46,13 +49,11 @@ function runExport() {
 
     capturer.start();
 	renderFrame(0);
-
-    exportAnimation();
 }
 
 let frame = 0;
 
-function renderFrame(time) {
+function renderFrame() {
     requestAnimationFrame(renderFrame);
 
     let canvas = document.getElementById("exportCanvas");
@@ -69,9 +70,7 @@ function renderFrame(time) {
     ctx.setTransform(widthMultiplier, 0, 0, heightMultiplier, 0, 0);
 
     // Update the animation
-    let seconds = time / 1000;
-
-    // console.log(seconds);
+    let seconds = frame / framerate;
     
     let objects = JSON.parse(localStorage.getItem("objects"));
     objects = getPositionsFromKeyframes(objects, seconds);
@@ -219,6 +218,9 @@ function renderFrame(time) {
 function stopCapture() {
     capturer.stop();
     capturer.save();
+
+    let canvas = document.getElementById("exportCanvas");
+    canvas.remove();
 }
 
 function createExportCanvas(width, height) {

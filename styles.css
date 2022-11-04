@@ -478,11 +478,15 @@ body {
 }
 
 .exportCanvas {
+    --margin: 20px;
+
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    top: var(--margin);
+    left: var(--margin);
+    max-width: calc(100% - var(--margin) * 2);
+    max-height: calc(100% - var(--margin) * 2);
     height: auto;
+    z-index: 2000;
 }
 
 .settings {
@@ -624,11 +628,11 @@ body {
     height: 10px;
     transform: rotate(45deg);
     left: -3px;
-    top: calc(var(--height) * 19px + 12px);
+    top: calc(var(--height) * 19px + 27px);
 }
 .timeline-column-line-marker:hover {
-    background-color: #ffc04b;
+    background-color: #ffc65d;
 }
 .timeline-column-line-marker.selected {
-    background-color: #ffc965;
+    background-color: #ffdfa4;
 }
