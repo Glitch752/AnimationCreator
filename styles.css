@@ -227,7 +227,7 @@ body {
     width: calc(var(--width) * var(--current-scale));
     height: calc(var(--height) * var(--current-scale));
 
-    --fill-color: #fff;
+    --fill-color: var(--color, #fff);
 
     background-color: var(--fill-color);
 }

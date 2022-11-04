@@ -414,6 +414,9 @@ function clickSelection(e) {
     setSelectionPosition(selection);
     selectionBoxDragDown(null);
 
+    let colorPicker = document.getElementById("objectColor");
+    colorPicker.value = getComputedStyle(selection).getPropertyValue("--color") || "#ffffff";
+
     // e.stopImmediatePropagation();
 }
 
@@ -509,7 +512,7 @@ function loadObjects(objects) {
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
                 ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
-                style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height};"
+                style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: ${object.color || "#ffffff"};"
             ></div>`;
     }
     
@@ -520,4 +523,10 @@ let objects = JSON.parse(localStorage.getItem("objects"));
 
 if(objects !== null) {
     loadObjects(objects);
+}
+
+function updateObjectColor(color) {
+    if(selectedElement === false) return;
+
+    selectedElement.style.setProperty("--color", color);
 }

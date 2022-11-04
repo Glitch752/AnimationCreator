@@ -279,4 +279,5 @@ function mouseDownMarker(object, marker, time) {
     timelineMarker.style.setProperty("--distance", (time * 19) + "px");
 
     updateElementPositions(time);
+    clickSelection({target: lastObjects[object]});
 }

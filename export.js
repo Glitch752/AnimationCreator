@@ -78,7 +78,7 @@ function renderFrame() {
     for (let i = 0; i < objects.length; i++) {
         const object = objects[i];
         
-        ctx.fillStyle = "white";
+        ctx.fillStyle = object.color || "#ffffff";
 
         switch(object.type) {
             default: {

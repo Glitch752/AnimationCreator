@@ -93,6 +93,7 @@ function updateObjectList() {
             width:  getComputedStyle(object).getPropertyValue("--width"  ),
             height: getComputedStyle(object).getPropertyValue("--height" ),
             data:   JSON.parse(objectData),
+            color: getComputedStyle(object).getPropertyValue("--color") || "#ffffff",
             keyframes: JSON.parse(objectKeyframes)
         });
     }
