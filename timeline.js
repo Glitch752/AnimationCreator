@@ -70,7 +70,7 @@ function refreshTimeline(objects) {
             const marker = keyframes[j];
 
             markers += `
-                <div class="timeline-column-line-marker ${(markerSelected !== null && i === markerSelected.object && j === markerSelected.marker) ? "selected" : ""}" style="--height: ${marker.time}" onpointerdown="mouseDownMarker(${i}, ${j})"></div>
+                <div class="timeline-column-line-marker ${(markerSelected !== null && i === markerSelected.object && j === markerSelected.marker) ? "selected" : ""}" style="--height: ${marker.time}" onpointerdown="mouseDownMarker(${i}, ${j}, ${marker.time})"></div>
             `;
         }
         
@@ -269,9 +269,14 @@ function easeOut(time) {
     return time * (2 - time);
 }
 
-function mouseDownMarker(object, marker) {
+function mouseDownMarker(object, marker, time) {
     markerSelected = {
         object: object,
         marker: marker
     };
+
+    let timelineMarker = document.getElementById("timelineMarker");
+    timelineMarker.style.setProperty("--distance", (time * 19) + "px");
+
+    updateElementPositions(time);
 }
