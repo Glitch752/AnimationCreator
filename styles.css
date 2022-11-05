@@ -279,7 +279,7 @@ body {
     --outline-color: #36789f;
     --drag-region-color: #275a77;
 
-    z-index: 1000;
+    z-index: 5;
 
     border: 5px solid var(--outline-color);
 }
@@ -521,17 +521,17 @@ body {
     white-space: nowrap;
 }
 
-.timeline::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 10px;
     height: 10px;
 }
-.timeline::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: #1f2227;
 }
-.timeline::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: #434d55;
 }
-.timeline::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background: #4f565e;
 }
 
@@ -566,6 +566,9 @@ body {
     width: 30px;
     display: inline-block;
     text-align: center;
+    text-decoration: underline;
+    color: #79c3ff;
+    cursor: pointer;
 }
 .timeline-column-header-time {
     width: 50px;
@@ -605,6 +608,7 @@ body {
     z-index: 10;
     left: -10px;
     top: calc(var(--distance, 0px) - var(--scroll, 0px) + 30px);
+    cursor: pointer;
 }
 .timeline-marker .drag {
     display: inline-block;
@@ -630,6 +634,7 @@ body {
     transform: rotate(45deg);
     left: -3px;
     top: calc(var(--height) * 19px + 27px);
+    cursor: pointer;
 }
 .timeline-column-line-marker:hover {
     background-color: #ffc65d;
@@ -695,4 +700,124 @@ body {
 }
 .pause-button.hidden {
     display: none;
+}
+
+.keyframe-editor-button {
+    width: 20px;
+    height: 20px;
+    fill: #30a091;
+    position: absolute;
+    margin: 5px;
+    top: 0;
+    left: 20px;
+}
+.keyframe-editor-button:hover {
+    fill: #4dc3b4;
+}
+
+.keyframe-editor {
+    --margin: 5px;
+
+    display: none;
+    position: absolute;
+    top: var(--margin);
+    width: calc(100vw - var(--right-panel-width) - var(--margin) * 2);
+    height: calc((100vh - var(--header-height) - var(--margin) * 3) / 2);
+    left: var(--margin);
+    background-color: #333b43f0;
+
+    z-index: 10;
+}
+.keyframe-editor.open {
+    display: inline-block;
+}
+
+.keyframe-selection {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+
+    width: 100%;
+}
+.keyframe-option {
+    color: white;
+    background-color: #4f565e;
+    margin: 5px;
+    padding: 5px;
+    width: 100px;
+    text-align: center;
+    cursor: pointer;
+}
+.keyframe-option:hover {
+    background-color: #687380;
+}
+.keyframe-option.selected {
+    background-color: #5688b1;
+}
+
+.keyframe-editor-select-property {
+    color: white;
+    font-size: 24px;
+    margin: 10px;
+}
+
+.keyframes {
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: calc(100% - 39px);
+}
+.keyframe-editor-times {
+    width: 100%;
+    width: max-content;
+    margin-left: 50px;
+}
+.keyframe-editor-time {
+    width: 100px;
+    display: inline-block;
+    height: calc((100vh - var(--header-height) - var(--margin) * 3) / 2 - 50px);
+    position: relative;
+}
+.keyframe-editor-time:last-of-type {
+    background-color: #00000033;
+}
+.keyframe-editor-time-text {
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+}
+.keyframe-editor-time-line {
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 3px;
+    background-color: #566877;
+}
+
+.keyframe-editor-marker {
+    position: absolute;
+    background-color: #ffa500;
+    width: 10px;
+    height: 10px;
+    transform: rotate(45deg);
+    left: calc(var(--distance) * 100px - 5px + 52px);
+    bottom: calc(var(--height) * calc(100% - 50px));
+    cursor: pointer;
+}
+.keyframe-editor-marker:hover {
+    background-color: #ffc65d;
+}
+
+.keyframe-editor-line {
+    position: absolute;
+    left: calc(var(--x) * 100px + 52px);
+    bottom: calc(var(--y) * calc(100% - 50px) + 3px);
+    
+    width: var(--length);
+    height: 4px;
+    transform-origin: 0% 0%;
+    transform: rotate(var(--rotation));
+
+    background-color: #ffa500;
 }

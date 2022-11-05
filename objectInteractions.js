@@ -11,6 +11,8 @@ let selectionElementStartX = 0, selectionElementStartY = 0;
 let selectionElementStartWidth = 0, selectionElementStartHeight = 0;
 
 const arrowChange = 100;
+
+// TODO: Refactor so the data isn't stored in the DOM 
   
 addGlobalListener("wheel", (e) => {
     let target = e.target;
@@ -516,6 +518,10 @@ function hideSelectionBox() {
     selectedElement = false;
 
     updateObjectList();
+    
+    document.getElementById("keyframeEditor").classList.remove("open");
+    document.querySelectorAll(".keyframe-option.selected").forEach(e => e.classList.remove("selected"));
+    document.getElementById("keyframes").innerHTML = `<span class="keyframe-editor-select-property">Select a property to edit keyframes</span>`;
 }
 
 function loadObjects(objects) {

@@ -84,6 +84,17 @@
                 <span><b>SHIFT:</b> Keep perfectly square</span>
             </div>
         </div>
+        <div class="keyframe-editor" id="keyframeEditor">
+            <div class="keyframe-selection">
+                <div class="keyframe-option" data-keyframe-option="x" onclick="selectKeyframeOption(this)">X</div>
+                <div class="keyframe-option" data-keyframe-option="y" onclick="selectKeyframeOption(this)">Y</div>
+                <div class="keyframe-option" data-keyframe-option="width" onclick="selectKeyframeOption(this)">Width</div>
+                <div class="keyframe-option" data-keyframe-option="height" onclick="selectKeyframeOption(this)">Height</div>
+            </div>
+            <div class="keyframes" id="keyframes">
+                <span class="keyframe-editor-select-property">Select a property to edit keyframes</span>
+            </div>
+        </div>
         <div class="rightPanel">
             <div class="leftContainer">
                 <div class="leftContainerTab selected" data-tab="add">

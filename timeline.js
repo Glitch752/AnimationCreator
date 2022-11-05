@@ -7,11 +7,15 @@ let totalMinutes = localStorage.getItem("duration") || 2;
 let markerSelected = null;
 
 let lastObjects = [];
+let lastObjectList = [];
 
 let playingTimeline = false;
 
-function refreshTimeline(objects) {
+// FIXME: This code creates a lot of forced reflows, which is bad for performance
+
+function refreshTimeline(objects, objectList) {
     lastObjects = objects;
+    lastObjectList = objectList;
 
     let timeline = document.getElementById("timeline");
 
@@ -62,6 +66,11 @@ function refreshTimeline(objects) {
                             <path d="M48 64C21.5 64 0 85.5 0 112V400c0 26.5 21.5 48 48 48H80c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H48zm192 0c-26.5 0-48 21.5-48 48V400c0 26.5 21.5 48 48 48h32c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H240z"/>
                         </svg>
                     </div>
+
+                    ${Array.from(objects).includes(selectedElement) ? `<svg class="keyframe-editor-button" onpointerdown="openKeyrameEditor()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                        <path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/>
+                    </svg>` : ""}
                 </div>
             </div>
             ${headers}
@@ -91,7 +100,7 @@ function refreshTimeline(objects) {
         
         timeline.innerHTML += `
             <div class="timeline-column">
-                <div class="timeline-column-line ${(selectionDraggingDirection !== false && selectedElement == object) ? "selected" : ""}">
+                <div class="timeline-column-line ${(selectedElement == object) ? "selected" : ""}">
                     ${markers}
                 </div>
             </div>
@@ -128,8 +137,11 @@ addGlobalListener("mousemove", function(e) {
         let timelineMarker = document.getElementById("timelineMarker");
         timelineMarker.style.setProperty("--distance", distance + "px");
         
+        let oldMarkerSelected = markerSelected;
         markerSelected = null;
-        refreshTimeline(lastObjects);
+        if(oldMarkerSelected !== null) {
+            refreshTimeline(lastObjects, lastObjectList);
+        }
 
         updateElementPositions(distance / 19);
         
@@ -221,10 +233,9 @@ function updateDuration() {
 }
 
 function updateElementPositions(time) {
-    let elements = document.getElementsByClassName("object");
-    for(let i = 0; i < elements.length; i++) {
-        const element = elements[i];
-        let keyframes = JSON.parse(element.dataset.keyframes || "[]");
+    for(let i = 0; i < lastObjectList.length; i++) {
+        const object = lastObjectList[i];
+        let keyframes = object.keyframes;
 
         let previousKeyframe = null;
         let nextKeyframe = null;
@@ -243,19 +254,19 @@ function updateElementPositions(time) {
             previousKeyframe = {
                 time: 0,
                 data: { 
-                    x: getComputedStyle(element).getPropertyValue("--offsetX"),
-                    y: getComputedStyle(element).getPropertyValue("--offsetY"),
-                    width: getComputedStyle(element).getPropertyValue("--width"),
-                    height: getComputedStyle(element).getPropertyValue("--height")
+                    x: object.x,
+                    y: object.y,
+                    width: object.width,
+                    height: object.height
                 }
             }
         }
         
         if(nextKeyframe === null) {
-            element.style.setProperty("--offsetX", previousKeyframe.data.x);
-            element.style.setProperty("--offsetY", previousKeyframe.data.y);
-            element.style.setProperty("--width", previousKeyframe.data.width);
-            element.style.setProperty("--height", previousKeyframe.data.height);
+            object.x = parseFloat(previousKeyframe.data.x);
+            object.y = parseFloat(previousKeyframe.data.y);
+            object.width = parseFloat(previousKeyframe.data.width);
+            object.height = parseFloat(previousKeyframe.data.height);
         } else {
             let difference = nextKeyframe.time - previousKeyframe.time;
             let progress = (time - previousKeyframe.time) / difference;
@@ -265,11 +276,17 @@ function updateElementPositions(time) {
             let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress);
             let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress);
 
-            element.style.setProperty("--offsetX", x + "px");
-            element.style.setProperty("--offsetY", y + "px");
-            element.style.setProperty("--width", width + "px");
-            element.style.setProperty("--height", height + "px");
+            object.x = x;
+            object.y = y;
+            object.width = width;
+            object.height = height;
         }
+
+        let element = document.querySelector(`.object[data-index="${i}"]`);
+        element.style.setProperty("--offsetX", object.x + "px");
+        element.style.setProperty("--offsetY", object.y + "px");
+        element.style.setProperty("--width", object.width + "px");
+        element.style.setProperty("--height", object.height + "px");
     }
 
     if(selectedElement === false) return;
@@ -319,6 +336,8 @@ function playTimeline() {
     document.getElementById("pauseButton").style.display = "block";
 
     playingInterval = setInterval(() => {
+        if(draggingTimeline) return;
+
         let timelineMarker = document.getElementById("timelineMarker");
         let distance = parseFloat(timelineMarker.style.getPropertyValue("--distance")) || 0;
         if(distance >= (totalMinutes * 60 - 1) * 19) {
@@ -332,10 +351,97 @@ function playTimeline() {
         updateElementPositions(distance / 19);
     }, 1000 / 60);
 }
+
 function pauseTimeline() {
     playingTimeline = false;
     document.getElementById("playButton").style.display = "block";
     document.getElementById("pauseButton").style.display = "none";
 
     clearInterval(playingInterval);
+}
+
+function openKeyrameEditor() {
+    document.getElementById("keyframeEditor").classList.toggle("open");
+}
+
+function selectKeyframeOption(element) {
+    document.querySelectorAll(".keyframe-option.selected").forEach(e => e.classList.remove("selected"));
+    element.classList.add("selected");
+
+    refreshKeyframeEditor();
+}
+
+function refreshKeyframeEditor() {
+    let selected = document.querySelector(".keyframe-option.selected");
+    let keyframe = selected.dataset.keyframeOption;
+
+    let objectData = lastObjectList[selectedElement.dataset.index];
+    let keyframeData = objectData.keyframes.map(k => {
+        return {time: k.time, data: k.data[keyframe]};
+    });
+
+    let maxValue = 1;
+    for(let i = 0; i < keyframeData.length; i++) {
+        const value = keyframeData[i].data;
+        if(parseFloat(value) > maxValue) maxValue = parseFloat(value);
+    }
+
+    let keyframes = document.getElementById("keyframes");
+
+    let times = ``, markers = ``, lines = ``;
+
+    for (let i = 0; i < totalMinutes; i++) {
+        let seconds = 60;
+        if(i === Math.ceil(totalMinutes) - 1) {
+            seconds = (totalMinutes - i) * 60;
+        }
+
+        for(let j = i === 0 ? 1 : 0; j < seconds; j++) {
+            times += `
+                <div class="keyframe-editor-time">
+                    <span class="keyframe-editor-time-text">${getformattedTime(i, j)}</span>
+                    <div class="keyframe-editor-time-line"></div>
+                </div>`;
+        }
+    }
+
+    times += `
+        <div class="keyframe-editor-time">
+            <div class="keyframe-editor-time-line"></div>
+        </div>`;
+
+    for(let i = 0; i < keyframeData.length; i++) {
+        let keyframe = keyframeData[i];
+        let nextKeyframe = keyframeData[i + 1] || null;
+        let time = keyframe.time;
+        let data = keyframe.data;
+
+        markers += `
+            <div class="keyframe-editor-marker" data-keyframe="${i}" style="--distance: ${time}; --height: ${parseFloat(data) / maxValue};"></div>
+        `;
+
+        if(nextKeyframe === null) continue;
+
+        let yMultiplier = parseFloat(getComputedStyle(document.getElementById("keyframes")).getPropertyValue("height")) - 10;
+
+        let xDifference = (nextKeyframe.time - keyframe.time) * 100;
+        let yDifference = (parseFloat(nextKeyframe.data) - parseFloat(keyframe.data)) / maxValue * yMultiplier;
+
+        console.log(xDifference, yDifference);
+
+        let rotation = -Math.atan2(yDifference, xDifference) * 180 / Math.PI;
+        let length = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
+
+        lines += `
+            <div class="keyframe-editor-line" data-keyframe="${i}" style="--x: ${time}; --y: ${parseFloat(data) / maxValue}; --rotation: ${rotation}deg; --length: ${length}px;"></div>
+        `;
+    }
+
+    keyframes.innerHTML = `
+        <div class="keyframe-editor-times">
+            ${times}
+            ${lines}
+            ${markers}
+        </div>
+    `;
 }

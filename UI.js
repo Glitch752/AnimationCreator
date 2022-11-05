@@ -101,7 +101,7 @@ function updateObjectList() {
 
     localStorage.setItem("objects", JSON.stringify(objectList));
 
-    refreshTimeline(objects);
+    refreshTimeline(objects, objectList);
 }
 
 function deleteObject(index) {
