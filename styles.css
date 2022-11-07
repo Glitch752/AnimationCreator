@@ -765,6 +765,7 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
     height: calc(100% - 39px);
+    position: relative;
 }
 .keyframe-editor-times {
     width: 100%;
@@ -802,7 +803,7 @@ body {
     height: 10px;
     transform: rotate(45deg);
     left: calc(var(--distance) * 100px - 5px + 52px);
-    bottom: calc(var(--height) * calc(100% - 50px));
+    bottom: calc(var(--height) * calc(100% - 45px) + 30px);
     cursor: pointer;
 }
 .keyframe-editor-marker:hover {
@@ -812,7 +813,7 @@ body {
 .keyframe-editor-line {
     position: absolute;
     left: calc(var(--x) * 100px + 52px);
-    bottom: calc(var(--y) * calc(100% - 50px) + 3px);
+    bottom: calc(var(--y) * calc(100% - 45px) + 30px + 3px);
     
     width: var(--length);
     height: 4px;
@@ -820,4 +821,17 @@ body {
     transform: rotate(var(--rotation));
 
     background-color: #ffa500;
+}
+
+.keyframe-editor-values {
+    position: absolute;
+    left: 10px;
+    height: 100%;
+    bottom: 30px;
+}
+.keyframe-editor-value {
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    bottom: calc(var(--height) * calc(100% - 50px));
 }

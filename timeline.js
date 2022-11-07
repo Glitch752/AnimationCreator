@@ -380,15 +380,18 @@ function refreshKeyframeEditor() {
         return {time: k.time, data: k.data[keyframe]};
     });
 
-    let maxValue = 1;
+    let maxValue = 0, minValue = 0;
     for(let i = 0; i < keyframeData.length; i++) {
         const value = keyframeData[i].data;
         if(parseFloat(value) > maxValue) maxValue = parseFloat(value);
+        if(parseFloat(value) < minValue) minValue = parseFloat(value);
     }
+
+    let range = maxValue - minValue;
 
     let keyframes = document.getElementById("keyframes");
 
-    let times = ``, markers = ``, lines = ``;
+    let times = ``, markers = ``, lines = ``, values = ``;
 
     for (let i = 0; i < totalMinutes; i++) {
         let seconds = 60;
@@ -417,28 +420,39 @@ function refreshKeyframeEditor() {
         let data = keyframe.data;
 
         markers += `
-            <div class="keyframe-editor-marker" data-keyframe="${i}" style="--distance: ${time}; --height: ${parseFloat(data) / maxValue};"></div>
+            <div class="keyframe-editor-marker" data-keyframe="${i}" style="--distance: ${time}; --height: ${(parseFloat(data) - minValue) / range};"></div>
         `;
 
         if(nextKeyframe === null) continue;
 
-        let yMultiplier = parseFloat(getComputedStyle(document.getElementById("keyframes")).getPropertyValue("height")) - 10;
+        let yMultiplier = parseFloat(getComputedStyle(document.getElementById("keyframes")).getPropertyValue("height")) - 45;
 
         let xDifference = (nextKeyframe.time - keyframe.time) * 100;
-        let yDifference = (parseFloat(nextKeyframe.data) - parseFloat(keyframe.data)) / maxValue * yMultiplier;
-
-        console.log(xDifference, yDifference);
+        let yDifference = (((parseFloat(nextKeyframe.data) - minValue) - (parseFloat(keyframe.data) - minValue)) / range) * yMultiplier;
 
         let rotation = -Math.atan2(yDifference, xDifference) * 180 / Math.PI;
         let length = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
 
         lines += `
-            <div class="keyframe-editor-line" data-keyframe="${i}" style="--x: ${time}; --y: ${parseFloat(data) / maxValue}; --rotation: ${rotation}deg; --length: ${length}px;"></div>
+            <div class="keyframe-editor-line" data-keyframe="${i}" style="--x: ${time}; --y: ${(parseFloat(data) - minValue) / range}; --rotation: ${rotation}deg; --length: ${length}px;"></div>
         `;
+    }
+
+    let valueMarks = 10;
+
+    for(let i = 0; i <= valueMarks; i++) {
+        values += `
+        <div class="keyframe-editor-value" style="--height: ${i / valueMarks};">
+            <span class="keyframe-editor-value-text">${Math.round(minValue + (maxValue - minValue) * (i / valueMarks))}</span>
+            <div class="keyframe-editor-value-line"></div>
+        </div>`;
     }
 
     keyframes.innerHTML = `
         <div class="keyframe-editor-times">
+            <div class="keyframe-editor-values">
+                ${values}
+            </div>
             ${times}
             ${lines}
             ${markers}
