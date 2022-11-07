@@ -94,6 +94,28 @@
             <div class="keyframes" id="keyframes">
                 <span class="keyframe-editor-select-property">Select a property to edit keyframes</span>
             </div>
+            <div class="keyframe-timing" id="keyframeTiming">
+                <select class="keyframe-timing-function" id="keyframeTimingFunction" onchange="changeKeyframeTimingFunction(this)">
+                    <option value="linear">Linear</option>
+                    <option value="easeIn">Ease-in</option>
+                    <option value="easeOut">Ease-out</option>
+                    <option value="easeInOut">Ease-in-out</option>
+                    <option value="bounce">Bounce</option>
+                    <option value="elastic">Elastic</option>
+                    <option value="step" data-custom="true" data-show-id="stepCount">Step</option>
+                    <option value="bezier" data-custom="true" data-show-id="bezierCurve">Bezier curve</option>
+                </select>
+                <div class="keyframe-timing-custom" id="stepCount">
+                    <input class="keyframe-timing-input" type="number" id="stepCountInput" placeholder="Step count"/>
+                </div>
+                <div class="keyframe-timing-custom" id="bezierCurve">
+                    <!-- TODO: Create bezier editor -->
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput1" placeholder="X1" />
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput2" placeholder="Y1" />
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput3" placeholder="X2" />
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput4" placeholder="Y2" />
+                </div>
+            </div>
         </div>
         <div class="rightPanel">
             <div class="leftContainer">

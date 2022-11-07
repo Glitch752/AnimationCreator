@@ -62,6 +62,9 @@ function mouseMove(e) {
 }
 
 function keyDown(e) {
+    // Check if the user is currently typing in an input field
+    if (document.activeElement.tagName == "INPUT") return;
+    
     runGlobalListeners("keydown", e);
 }
 function keyUp(e) {

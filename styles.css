@@ -822,6 +822,12 @@ body {
 
     background-color: #a08148;
 }
+.keyframe-editor-line:hover {
+    background-color: #c4a16e;
+}
+.keyframe-editor-line.selected {
+    background-color: #ffdfa4;
+}
 
 .keyframe-editor-values {
     position: absolute;
@@ -847,4 +853,51 @@ body {
     height: 2px;
     transform: translateY(-10px);
     position: fixed;
+}
+
+
+.keyframe-timing {
+    --margin: 5px;
+
+    display: none;
+
+    position: absolute;
+    top: calc(var(--margin) + ((100vh - var(--header-height) - var(--margin) * 3) / 2));
+    width: calc(100vw - var(--right-panel-width) - var(--margin) * 2);
+    left: 0;
+    background-color: #333b43f0;
+    padding: 5px;
+
+    z-index: 10;
+}
+.keyframe-timing.shown {
+    display: block;
+}
+.keyframe-timing-function {
+    outline: none;
+    border: none;
+    background-color: transparent;
+    width: 200px;
+    color: white;
+    font-size: 20px;
+}
+.keyframe-timing-function option {
+    background-color: #4f565e;
+}
+
+.keyframe-timing-custom {
+    display: none;
+}
+.keyframe-timing-custom.shown {
+    display: inline-block;
+}
+
+.keyframe-timing-input {
+    outline: none;
+    border: none;
+    background-color: transparent;
+    width: 200px;
+    color: white;
+    font-size: 20px;
+    margin-left: 20px;
 }

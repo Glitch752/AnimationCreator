@@ -522,6 +522,8 @@ function hideSelectionBox() {
     document.getElementById("keyframeEditor").classList.remove("open");
     document.querySelectorAll(".keyframe-option.selected").forEach(e => e.classList.remove("selected"));
     document.getElementById("keyframes").innerHTML = `<span class="keyframe-editor-select-property">Select a property to edit keyframes</span>`;
+    
+    document.getElementById("keyframeTiming").classList.remove("shown");
 }
 
 function loadObjects(objects) {

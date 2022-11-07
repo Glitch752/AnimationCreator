@@ -374,6 +374,8 @@ function selectKeyframeOption(element) {
 function refreshKeyframeEditor() {
     let selected = document.querySelector(".keyframe-option.selected");
     let keyframe = selected.dataset.keyframeOption;
+    
+    document.getElementById("keyframeTiming").classList.remove("shown");
 
     let objectData = lastObjectList[selectedElement.dataset.index];
     let keyframeData = objectData.keyframes.map(k => {
@@ -434,7 +436,7 @@ function refreshKeyframeEditor() {
         let length = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
 
         lines += `
-            <div class="keyframe-editor-line" data-keyframe="${i}" style="--x: ${time}; --y: ${(parseFloat(data) - minValue) / range}; --rotation: ${rotation}deg; --length: ${length}px;"></div>
+            <div class="keyframe-editor-line" onpointerdown="clickKeyframeLine(this)" data-keyframe="${i}" style="--x: ${time}; --y: ${(parseFloat(data) - minValue) / range}; --rotation: ${rotation}deg; --length: ${length}px;"></div>
         `;
     }
 
@@ -458,4 +460,25 @@ function refreshKeyframeEditor() {
             ${markers}
         </div>
     `;
+}
+
+function clickKeyframeLine(element) {
+    let currentSelected = document.querySelectorAll(".keyframe-editor-line.selected");
+    currentSelected.forEach(e => e.classList.remove("selected"));
+
+    element.classList.add("selected");
+
+    document.getElementById("keyframeTiming").classList.add("shown");
+}
+
+function changeKeyframeTimingFunction(element) {
+    let selected = element.children[element.selectedIndex];
+    
+    document.querySelectorAll(".keyframe-timing-custom.shown").forEach(e => e.classList.remove("shown"));
+
+    let custom = selected.dataset.custom === "true";
+    if(custom) {
+        let showID = selected.dataset.showId;
+        document.getElementById(showID).classList.add("shown");
+    }
 }
