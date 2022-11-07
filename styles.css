@@ -820,7 +820,7 @@ body {
     transform-origin: 0% 0%;
     transform: rotate(var(--rotation));
 
-    background-color: #ffa500;
+    background-color: #a08148;
 }
 
 .keyframe-editor-values {
@@ -834,4 +834,17 @@ body {
     font-size: 16px;
     position: absolute;
     bottom: calc(var(--height) * calc(100% - 50px));
+}
+.keyframe-editor-value-text {
+    position: absolute;
+    transform: translateY(-8px);
+    z-index: 10;
+}
+.keyframe-editor-value-line {
+    position: absolute;
+    background-color: #454f57;
+    width: calc(100% - var(--margin) * 2 - var(--right-panel-width) - 20px);
+    height: 2px;
+    transform: translateY(-10px);
+    position: fixed;
 }
