@@ -62,8 +62,8 @@ function mouseMove(e) {
 }
 
 function keyDown(e) {
-    // Check if the user is currently typing in an input field
-    if (document.activeElement.tagName == "INPUT") return;
+    // Check if the user is currently typing in an input field or textarea
+    if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
 
     runGlobalListeners("keydown", e);
 }

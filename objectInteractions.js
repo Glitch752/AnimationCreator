@@ -13,6 +13,10 @@ let selectionElementStartWidth = 0, selectionElementStartHeight = 0;
 const arrowChange = 100;
 
 // TODO: Refactor so the data isn't stored in the DOM 
+
+const objectElementTypes = {
+    "text": "textarea"
+};
   
 addGlobalListener("wheel", (e) => {
     let target = e.target;
@@ -284,14 +288,16 @@ addGlobalListener("mousemove", (e) => {
             let frame = document.getElementById("frame");
 
             // let lineSide = "bottomleft"
+            let type = objectElementTypes[draggingObject] || "div";
 
             frame.innerHTML += `
-                <div class='object ${draggingObject} temp'
+                <${type} class='object ${draggingObject} temp'
                     data-object-type="${draggingObject}"
+                    ${draggingObject === "text" ? `placeholder="Text..."` : ""}
                     data-object-data='${draggingObject === "polygon" ? `${JSON.stringify(draggingObjectData)}` : ""}'
                     ${draggingObject === "polygon" ? `data-${draggingObjectData.sides}-sides ` : ""}
                     ${draggingObject === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
-                ></div>`;
+                ></${type}>`;
 
             regenerateSelectedListeners();
             updateObjectList();
@@ -536,7 +542,7 @@ function loadObjects(objects) {
         const object = objects[i];
 
         const objectElementTypes = {
-            "text": "input"
+            "text": "textarea"
         };
 
         let type = objectElementTypes[object.type] || "div";
@@ -546,6 +552,7 @@ function loadObjects(objects) {
                 data-object-type="${object.type}"
                 data-object-data='${object.type === "polygon" ? `${JSON.stringify(object.data)}` : ""}'
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
+                ${object.type === "text" ? `placeholder="Text..."` : ""}
                 ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: ${object.color || "#ffffff"};"

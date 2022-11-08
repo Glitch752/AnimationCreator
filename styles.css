@@ -269,6 +269,14 @@ body {
     transform: rotate(var(--rotation));
 }
 
+.object.text {
+    background-color: transparent;
+    color: var(--fill-color);
+    font-size: calc(var(--size, 50px) * var(--current-scale));
+    outline: none;
+    border: none;
+}
+
 .selectionBox {
     position: absolute;
     left: calc(var(--offsetX) * var(--current-scale));
