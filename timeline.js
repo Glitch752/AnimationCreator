@@ -182,7 +182,8 @@ addGlobalListener("keydown", function(e) {
                         y: selectedElement.style.getPropertyValue("--offsetY"),
                         width: selectedElement.style.getPropertyValue("--width"),
                         height: selectedElement.style.getPropertyValue("--height")
-                    }
+                    },
+                    timingFunction: "easeInOut"
                 });
 
                 selectedElement.dataset.keyframes = JSON.stringify(currentKeyframes);
@@ -258,7 +259,8 @@ function updateElementPositions(time) {
                     y: object.y,
                     width: object.width,
                     height: object.height
-                }
+                },
+                timingFunction: "easeInOut"
             }
         }
         
@@ -271,10 +273,12 @@ function updateElementPositions(time) {
             let difference = nextKeyframe.time - previousKeyframe.time;
             let progress = (time - previousKeyframe.time) / difference;
 
-            let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress);
-            let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress);
-            let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress);
-            let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress);
+            let timing = previousKeyframe.timingFunction || "easeInOut";
+
+            let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress, timing);
+            let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress, timing);
+            let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress, timing);
+            let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress, timing);
 
             object.x = x;
             object.y = y;
@@ -293,15 +297,25 @@ function updateElementPositions(time) {
     setSelectionPosition(selectedElement);
 }
 
-function interpolate(a, b, t, ease = "ease-in-out") {
+function interpolate(a, b, t, ease = "easeInOut") {
     if(ease === "linear") {
         return a + (b - a) * t;
-    } else if(ease === "ease-in-out") {
+    } else if(ease === "easeInOut") {
         return a + (b - a) * easeInOut(t);
-    } else if(ease === "ease-in") {
+    } else if(ease === "easeIn") {
         return a + (b - a) * easeIn(t);
-    } else if(ease === "ease-out") {
+    } else if(ease === "easeOut") {
         return a + (b - a) * easeOut(t);
+    } else if(ease === "bounce") {
+        return a + (b - a) * bounce(t);
+    } else if(ease === "elastic") {
+        return a + (b - a) * elastic(t);
+    } else if(ease === "step") {
+        // TODO: Make these values come from the inputs
+        return a + (b - a) * step(t, 10);
+    } else if(ease === "bezier") {
+        // FIXME: Currently creates infinite loops, temporarily disabled.
+        return a + (b - a) * bezier(t, 0.25, 0.1, 0.25, 1);
     }
 }
 
@@ -314,6 +328,80 @@ function easeIn(time) {
 function easeOut(time) {
     return time * (2 - time);
 }
+
+function bounce(time) {
+    for(let a = 0, b = 1; 1; a += b, b /= 2) {
+        if(time >= (7 - 4 * a) / 11) {
+            return -Math.pow((11 - 6 * a - 11 * time) / 4, 2) + Math.pow(b, 2);
+        }
+    }
+}
+
+function elastic(time) {
+    return Math.pow(2, 10 * (time - 1)) * Math.cos(20 * Math.PI * 1.5 / 3 * time);
+}
+
+function step(time, steps) {
+    return Math.floor(time * steps) / steps;
+}
+
+
+// Currently creates infinite loops, temporarily disabled.
+// function bezier(t, x1, y1, x2, y2, duration = 50) {
+//     // For a certain time from 0 to 1 in a cubic bezier curve, find a single y value.
+//     // This function should mimic the result of CSS bezier curve timings.
+//     let epsilon = (1000 / 60 / duration) / 4;
+
+//     const curveX = (t) => {
+// 		let v = 1 - t;
+// 		return 3 * v * v * t * x1 + 3 * v * t * t * x2 + t * t * t;
+// 	};
+
+// 	const curveY = (t) => {
+// 		let v = 1 - t;
+// 		return 3 * v * v * t * y1 + 3 * v * t * t * y2 + t * t * t;
+// 	};
+
+// 	const derivativeCurveX = (t) => {
+// 		let v = 1 - t;
+// 		return 3 * (2 * (t - 1) * t + v * v) * x1 + 3 * (- t * t * t + 2 * v * t) * x2;
+// 	};
+
+//     var x = t, t0, t1, t2, x2, d2, i;
+
+//     // Try Newton's method
+//     for (t2 = x, i = 0; i < 8; i++) {
+//         x2 = curveX(t2) - x;
+//         if (Math.abs(x2) < epsilon) return curveY(t2);
+
+//         d2 = derivativeCurveX(t2);
+//         if (Math.abs(d2) < 1e-6) break;
+
+//         t2 = t2 - x2 / d2;
+//     }
+
+//     t0 = 0, t1 = 1, t2 = x;
+
+//     if (t2 < t0) return curveY(t0);
+//     if (t2 > t1) return curveY(t1);
+
+//     // Use the bisection method if necessary
+//     while (t0 < t1) {
+//         x2 = curveX(t2);
+//         if (Math.abs(x2 - x) < epsilon) return curveY(t2);
+
+//         if (x > x2) {
+//             t0 = t2;
+//         } else {
+//             t1 = t2;
+//         }
+
+//         t2 = (t1 - t0) * 0.5 + t0;
+//     }
+
+//     // If we got here, we didn't find a solution
+//     return curveY(t2);
+// }
 
 function mouseDownMarker(object, marker, time) {
     markerSelected = {
@@ -462,6 +550,8 @@ function refreshKeyframeEditor() {
     `;
 }
 
+let selectedLine = null;
+
 function clickKeyframeLine(element) {
     let currentSelected = document.querySelectorAll(".keyframe-editor-line.selected");
     currentSelected.forEach(e => e.classList.remove("selected"));
@@ -469,6 +559,12 @@ function clickKeyframeLine(element) {
     element.classList.add("selected");
 
     document.getElementById("keyframeTiming").classList.add("shown");
+
+    selectedLine = {
+        index: parseInt(element.dataset.keyframe)
+    };
+
+    document.getElementById("keyframeTimingFunction").value = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.timingFunction || "easeInOut";
 }
 
 function changeKeyframeTimingFunction(element) {
@@ -481,4 +577,12 @@ function changeKeyframeTimingFunction(element) {
         let showID = selected.dataset.showId;
         document.getElementById(showID).classList.add("shown");
     }
+
+    // Get the selected element's data
+    let selectedELement = lastObjectList[selectedElement.dataset.index];
+    let selectedKeyframe = selectedELement.keyframes[selectedLine.index];
+
+    selectedKeyframe.timingFunction = element.value;
+
+    selectedElement.dataset.keyframes = JSON.stringify(selectedELement.keyframes);
 }
