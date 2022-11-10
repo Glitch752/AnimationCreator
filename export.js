@@ -206,9 +206,76 @@ function renderFrame() {
             case "text": {
                 let { x, y, width, height, data } = object;
 
-                ctx.font = `20px Arial`;
+                x = parseFloat(x);
+                y = parseFloat(y);
+                width = parseFloat(width);
+                height = parseFloat(height);
+
+                let fontSize = 50;
+                let lineHeight = 50;
+
+                ctx.font = `${fontSize}px monospace`;
                 
-                // TODO: Add text elements
+                // Break the text into multiple lines and word wrap whenever necessary. If the word is too long to fit on a line, it will be split up.
+                let lines = [];
+                let words = data.text.split("\n").join(" \n ").split(" ");
+                let currentLine = "";
+
+                for(let i = 0; i < words.length; i++) {
+                    let word = words[i];
+
+                    if(word === "\n") {
+                        lines.push(currentLine);
+                        currentLine = "";
+                        continue;
+                    }
+                    
+                    if(ctx.measureText(word).width > width) {
+                        let splitWord = word.split("");
+                        let currentWord = "";
+                        for(let i = 0; i < splitWord.length; i++) {
+                            let letter = splitWord[i];
+                            if(ctx.measureText(currentWord + letter).width > width) {
+                                lines.push(currentWord);
+                                currentWord = "";
+                            }
+                            currentWord += letter;
+                        }
+                        lines.push(currentWord);
+                    }
+
+                    if(ctx.measureText(currentLine + word).width > width) {
+                        lines.push(currentLine);
+                        currentLine = word + " ";
+                    } else {
+                        currentLine += word + " ";
+                    }
+                }
+
+                lines.push(currentLine);
+
+                // If the text is higher than the object, remove lines from the bottom until it fits. If the height ends up on a portion of text, clip the text.
+                while((lines.length - 2) * lineHeight + fontSize > height) {
+                    lines.pop();
+                }
+
+                // Draw the text
+                for(let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    if((i * lineHeight + fontSize) > height) {
+                        // let offset = (i * lineHeight) - height;
+                        // Clip the text
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.rect(x, y, width, height);
+                        ctx.clip();
+                        ctx.fillText(line, x, y + (i + 1) * lineHeight);
+                        ctx.restore();
+                    } else {
+                        ctx.fillText(line, x, y + (i + 1) * lineHeight);
+                    }
+                }
+                break;
             }
         }
     }
@@ -263,7 +330,13 @@ function getPositionsFromKeyframes(objects, time) {
         if(previousKeyframe === null) {
             previousKeyframe = {
                 time: 0,
-                data: { x: 0, y: 0, width: 0, height: 0 }
+                data: { 
+                    x: object.x,
+                    y: object.y,
+                    width: object.width,
+                    height: object.height
+                },
+                timingFunction: "easeInOut"
             }
         }
         

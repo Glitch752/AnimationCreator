@@ -277,6 +277,10 @@ body {
     border: none;
     resize: none;
 
+    font-family: monospace;
+
+    line-height: calc(50px * var(--current-scale));
+
     overflow: hidden;
 }
 
