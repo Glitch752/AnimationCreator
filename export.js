@@ -203,6 +203,13 @@ function renderFrame() {
                     parseFloat(object.height));
                 break;
             }
+            case "text": {
+                let { x, y, width, height, data } = object;
+
+                ctx.font = `20px Arial`;
+                
+                // TODO: Add text elements
+            }
         }
     }
     

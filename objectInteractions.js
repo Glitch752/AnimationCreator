@@ -102,7 +102,7 @@ addGlobalListener("mousedown", (e) => {
             draggingObjectData["sides"] = document.getElementById("polygonSides").value;
         }
         if(selectedAddObject === "text") {
-            draggingObjectData["text"] = "Add text here...";
+            draggingObjectData["text"] = "";
         }
 
         return;
@@ -122,6 +122,7 @@ addGlobalListener("mousedown", (e) => {
 });
 
 function checkSelectionBoxDrag(e) {
+
     if(e.target.classList.contains("selectionBoxDragRegion")) {
         selectionBoxDragDown(e.target);
 
@@ -239,6 +240,8 @@ addGlobalListener("mousemove", (e) => {
             setSelectionPosition(selectedElement);
         }
     } else if(mouseClicked) {
+        if(checkDraggingTextBorder()) return;
+
         let mouseMovedX = startMouseX - mouseX;
         let mouseMovedY = startMouseY - mouseY;
 
@@ -293,7 +296,8 @@ addGlobalListener("mousemove", (e) => {
             frame.innerHTML += `
                 <${type} class='object ${draggingObject} temp'
                     data-object-type="${draggingObject}"
-                    ${draggingObject === "text" ? `placeholder="Text..."` : ""}
+                    ${draggingObject === "text" ? `placeholder="Text..."
+                    onchange="changeTextObject(this)"` : ""}
                     data-object-data='${draggingObject === "polygon" ? `${JSON.stringify(draggingObjectData)}` : ""}'
                     ${draggingObject === "polygon" ? `data-${draggingObjectData.sides}-sides ` : ""}
                     ${draggingObject === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
@@ -465,8 +469,6 @@ function setSelectionPosition(selection) {
         let newKeyframes = selection.dataset.keyframes || "[]";
         newKeyframes = JSON.parse(newKeyframes);
 
-        console.log(newKeyframes);
-
         newKeyframes[markerSelected.marker].data = {
             "x": selection.style.getPropertyValue("--offsetX"),
             "y": selection.style.getPropertyValue("--offsetY"),
@@ -481,6 +483,10 @@ function setSelectionPosition(selection) {
 // let selectionBoxDragRegions = document.querySelectorAll(".selectionBoxDragRegion");
 
 function selectionBoxDragDown(element) {
+    if(checkDraggingTextBorder()) return;
+
+    clearSelection();
+
     updateObjectList();
     if(element === null) {
         selectionDraggingDirection = "selection";
@@ -533,6 +539,25 @@ function hideSelectionBox() {
     selectedLine = null;
 }
 
+function checkDraggingTextBorder() {
+    if (document.activeElement.tagName === "TEXTAREA") {
+        // Check if we're clicking the border of the textarea
+        let textarea = document.activeElement;
+        let textareaRect = textarea.getBoundingClientRect();
+
+        let borderSize = 10;
+        
+        if(    mouseX >= textareaRect.left   + borderSize 
+            && mouseX <= textareaRect.right  - borderSize
+            && mouseY >= textareaRect.top    + borderSize
+            && mouseY <= textareaRect.bottom - borderSize) {
+            return true;
+        }
+    };
+
+    return false;
+}
+
 function loadObjects(objects) {
     document.querySelectorAll(".object").forEach(object => object.remove());
 
@@ -550,16 +575,28 @@ function loadObjects(objects) {
         frame.innerHTML += `
             <${type} class='object ${object.type}'
                 data-object-type="${object.type}"
-                data-object-data='${object.type === "polygon" ? `${JSON.stringify(object.data)}` : ""}'
+                data-object-data='${object.type === "polygon" || object.type === "text" ? `${JSON.stringify(object.data)}` : ""}'
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
-                ${object.type === "text" ? `placeholder="Text..."` : ""}
+                ${object.type === "text" ? `placeholder="Text..."
+                onchange="changeTextObject(this)"` : ""}
                 ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: ${object.color || "#ffffff"};"
             ></${type}>`;
+
+        if(object.type === "text") {
+            let textObject = frame.lastElementChild;
+            textObject.value = object.data.text || "";
+        }
     }
     
     regenerateSelectedListeners();
+}
+
+function changeTextObject(element) {
+    lastObjectList[element.dataset.index].data.text = element.value;
+    element.dataset.objectData = JSON.stringify(lastObjectList[element.dataset.index].data);
+    updateObjectList();
 }
 
 let objects = JSON.parse(localStorage.getItem("objects"));
@@ -572,4 +609,22 @@ function updateObjectColor(color) {
     if(selectedElement === false) return;
 
     selectedElement.style.setProperty("--color", color);
+}
+
+function clearSelection() {
+    let selection;
+    if((selection = document.selection) && selection.empty) {
+        selection.empty();
+    } else {
+        if(window.getSelection) {
+            window.getSelection().removeAllRanges();
+        }
+        if(document.activeElement) {
+            var tagName = document.activeElement.nodeName.toLowerCase();
+            if (tagName == "textarea" || (tagName == "input" && document.activeElement.type == "text")) {
+                // Collapse the selection to the end
+                document.activeElement.selectionStart = document.activeElement.selectionEnd;
+            }
+        }
+    }
 }

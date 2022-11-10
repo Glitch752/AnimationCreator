@@ -275,6 +275,9 @@ body {
     font-size: calc(var(--size, 50px) * var(--current-scale));
     outline: none;
     border: none;
+    resize: none;
+
+    overflow: hidden;
 }
 
 .selectionBox {
@@ -290,6 +293,8 @@ body {
     z-index: 5;
 
     border: 5px solid var(--outline-color);
+
+    pointer-events: none;
 }
 
 .selectionBox:not(.shown) {
@@ -308,6 +313,8 @@ body {
     transform: translate(-50%, -50%);
 
     --outerEdge: 2px;
+
+    pointer-events: all;
 }
 
 .selectionBoxDragRegion[data-drag-region="topleft"] {
