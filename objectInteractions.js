@@ -95,8 +95,6 @@ addGlobalListener("mousedown", (e) => {
 
         draggingObjectStartX = (mouseX - frame.getBoundingClientRect().left) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
         draggingObjectStartY = (mouseY - frame.getBoundingClientRect().top) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-        
-        // alert(`${draggingObjectStartX} ${draggingObjectStartY}`);
 
         if(selectedAddObject === "polygon") {
             draggingObjectData["sides"] = document.getElementById("polygonSides").value;
@@ -157,7 +155,6 @@ addGlobalListener("mousemove", (e) => {
     mouseY = e.clientY;
 
     if(selectionDraggingDirection !== false) {
-        let frame = document.getElementById("frame");
         if(selectedElement.dataset.objectType === "line") {
             switch(selectionDraggingDirection) {
                 case "left":
@@ -248,13 +245,9 @@ addGlobalListener("mousemove", (e) => {
         let offsetChangeX = startclientX - mouseMovedX;
         let offsetChangeY = startclientY - mouseMovedY;
 
-        // console.log(mouseX);
-
         document.documentElement.style.setProperty("--current-offset-x", offsetChangeX + "px");
         document.documentElement.style.setProperty("--current-offset-y", offsetChangeY + "px");
     } else if(draggingObject !== false) {
-        // <div class="object circle temp"
-        //      style="--offsetX: 500px; --offsetY: 200px; --width: 150px; --height: 100px"></div>
         let currentTemp = document.querySelector(".object.temp");
         if(currentTemp) {
             let frame = document.getElementById("frame");
@@ -365,6 +358,7 @@ addGlobalListener("keydown", (e) => {
             break;
         case "Backspace":
         case "Delete":
+            if(markerSelected !== null) return;
             if(selectedElement !== false) {
                 selectedElement.remove();
                 selectedElement = false;
@@ -760,7 +754,7 @@ function loadObjects(objects) {
 
         if(object.type === "text") {
             let textObject = frame.lastElementChild;
-            textObject.value = object.data.text || "";
+            textObject.innerText = object.data.text || "";
         }
 
         for(const data in dataToProperty) {

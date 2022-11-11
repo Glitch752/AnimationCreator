@@ -212,10 +212,23 @@ function renderFrame() {
                 width = parseFloat(width);
                 height = parseFloat(height);
 
-                let fontSize = 50;
-                let lineHeight = 50;
+                let fontSize = data.size || 50;
+                let lineHeight = data.lineHeight || 50;
+                let font = `${fontSize}px ${data.font || "monospace"}`;
 
-                ctx.font = `${fontSize}px monospace`;
+                ctx.textAlign = data.textAlign || "left";
+
+                if(data.italic) {
+                    font = `italic ${font}`;
+                }
+                if(data.bold) {
+                    font = `bold ${font}`;
+                }
+
+                // TODO: Fix lineHeight either here or in CSS so they behave the same:
+                // Currently CSS basically centers the text in the middle of a box with size lineHeight.
+
+                ctx.font = `${font}`;
                 
                 // Break the text into multiple lines and word wrap whenever necessary. If the word is too long to fit on a line, it will be split up.
                 let lines = [];
@@ -260,6 +273,13 @@ function renderFrame() {
                     lines.pop();
                 }
 
+                let xOffset = 0;
+                if(data.textAlign === "center") {
+                    xOffset = width / 2;
+                } else if(data.textAlign === "right") {
+                    xOffset = width;
+                }
+
                 // Draw the text
                 for(let i = 0; i < lines.length; i++) {
                     let line = lines[i];
@@ -270,10 +290,10 @@ function renderFrame() {
                         ctx.beginPath();
                         ctx.rect(x, y, width, height);
                         ctx.clip();
-                        ctx.fillText(line, x, y + (i + 1) * lineHeight);
+                        ctx.fillText(line, x + xOffset, y + (i + 1) * lineHeight);
                         ctx.restore();
                     } else {
-                        ctx.fillText(line, x, y + (i + 1) * lineHeight);
+                        ctx.fillText(line, x + xOffset, y + (i + 1) * lineHeight);
                     }
                 }
                 break;
