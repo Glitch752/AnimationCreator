@@ -23,14 +23,23 @@ function runExport() {
     } else {
         fps = fpsElement?.dataset?.framerate;
     }
-
-    exportAnimation();
-
-    // TODO: Add an actual error message for the user
+    
     if(!width || !height || !fps || !exportType) {
-        console.error("Invalid export settings");
+        let errorBox = document.getElementById("errorBox");
+        errorBox.classList.add("shown");
+
+        if(!width || !height) {
+            errorBox.innerHTML = "Please select a resolution";
+        } else if(!fps) {
+            errorBox.innerHTML = "Please select a frame rate";
+        } else if(!exportType) {
+            errorBox.innerHTML = "Please select an export type";
+        }
+
         return;
     }
+    
+    exportAnimation();
 
     framerate = fps;
 

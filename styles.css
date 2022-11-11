@@ -928,3 +928,14 @@ body {
     color: white;
     font-size: 20px;
 }
+
+.error-box {
+    display: none;
+    color: white;
+    padding: 5px;
+    font-size: 20px;
+    background-color: #d34747;
+}
+.error-box.shown {
+    display: block;
+}
