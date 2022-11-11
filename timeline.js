@@ -309,7 +309,11 @@ function interpolate(a, b, t, ease = "easeInOut") {
     } else if(ease === "bounce") {
         return a + (b - a) * bounce(t);
     } else if(ease === "elastic") {
-        return a + (b - a) * elastic(t);
+        return a + (b - a) * elastic(t); 
+    } else if(ease === "bounceReversed") {
+        return a + (b - a) * bounceReversed(t);
+    } else if(ease === "elasticReversed") {
+        return a + (b - a) * elasticReversed(t);
     } else if(ease === "step") {
         // TODO: Make these values come from the inputs
         return a + (b - a) * step(t, 10);
@@ -343,6 +347,14 @@ function elastic(time) {
 
 function step(time, steps) {
     return Math.floor(time * steps) / steps;
+}
+
+function bounceReversed(time) {
+    return 1 - bounce(1 - time);
+}
+
+function elasticReversed(time) {
+    return 1 - elastic(1 - time);
 }
 
 

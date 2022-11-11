@@ -419,7 +419,6 @@ function regenerateSelectedListeners() {
 let selectedElement = false;
 
 function clickSelection(e) {
-    // Find what's wrong with this function
     if(draggingObject !== false) return;
 
     let selection = e.target;
@@ -430,7 +429,170 @@ function clickSelection(e) {
     selectionBoxDragDown(null);
 
     let colorPicker = document.getElementById("objectColor");
-    colorPicker.value = getComputedStyle(selection).getPropertyValue("--color") || "#ffffff";
+    colorPicker.value = getComputedStyle(selection).getPropertyValue("--color").trim() || "#ffffff";
+
+    let customObjectSettings = document.getElementById("customObjectSettings");
+    customObjectSettings.innerHTML = "";
+
+    const objectTypeCustomSettings = {
+        "text": [
+            {
+                "name": "Size",
+                "value": "size",
+                "type": "number",
+                "min": 1,
+                "setProperty": { "property": "--size", "withPixels": true }
+            },
+            {
+                "name": "Font",
+                "value": "font",
+                "type": "text",
+                "setProperty": { "property": "font-family" }
+                // TODO: Add font picker
+            },
+            { "name": "Bold",          "value": "bold",          "type": "checkbox", "setProperty": { "property": "font-weight", "value": "700" } },
+            { "name": "Italic",        "value": "italic",        "type": "checkbox", "setProperty": { "property": "font-style", "value": "italic" } },
+            // TODO: Add underline
+            // { "name": "Underline",     "value": "underline",     "type": "checkbox", "setProperty": { "property": "text-decoration", "value": "underline" } },
+            {
+                "name": "Align",
+                "value": "textAlign",
+                "type": "select",
+                "options": [{ "value": "left", "name": "Left"}, {"value": "center", "name": "Center"}, {"value": "right", "name": "Right"}],
+                "setProperty": { "property": "text-align" }
+            },
+            {
+                "name": "Line Height",
+                "value": "lineHeight",
+                "type": "number",
+                "min": 1,
+                "setProperty": { "property": "line-height", "withPixels": true }
+            },
+            // TODO: Add letter spacing
+            // {
+            //     // Letter spacing is different than the other properties because we set the letter-spacing property on the canvas element.
+            //     "name": "Letter Spacing",
+            //     "value": "letterSpacing",
+            //     "type": "number",
+            //     "min": 0,
+            //     "setProperty": { "property": "letter-spacing", "withPixels": true }
+            // }
+            // TODO: Add text shadow
+        ]
+    };
+
+    let customSettings = objectTypeCustomSettings[selection.dataset.objectType] || [];
+    for(let i = 0; i < customSettings.length; i++) {
+        let setting = customSettings[i];
+        let settingElement = document.createElement("div");
+        settingElement.classList.add("customObjectSetting");
+
+        switch(setting.type) {
+            case "number": {
+                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+
+                let numberInput = document.createElement("input");
+                numberInput.type = "number";
+                numberInput.min = setting.min || null;
+                numberInput.max = setting.max || null;
+                numberInput.value = objectData[setting.value] || 0;
+                numberInput.addEventListener("change", (e) => {
+                    objectData[setting.value] = e.target.value;
+                    selection.dataset.objectData = JSON.stringify(objectData);
+                    updateObjectList();
+
+                    if(setting.setProperty) {
+                        let propertyValue = e.target.value;
+                        if(setting.setProperty.withPixels) {
+                            propertyValue += "px";
+                        }
+
+                        selection.style.setProperty(setting.setProperty.property, propertyValue);
+                    }
+                });
+
+                numberInput.id = "objectSetting_" + setting.value;
+                settingElement.appendChild(numberInput);
+                break;
+            }
+            case "text": {
+                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+
+                let textInput = document.createElement("input");
+                textInput.type = "text";
+                textInput.value = objectData[setting.value] || "";
+                textInput.addEventListener("change", (e) => {
+                    objectData[setting.value] = e.target.value;
+                    selection.dataset.objectData = JSON.stringify(objectData);
+                    updateObjectList();
+
+                    if(setting.setProperty) {
+                        selection.style.setProperty(setting.setProperty.property, e.target.value);
+                    }
+                });
+
+                textInput.id = "objectSetting_" + setting.value;
+                settingElement.appendChild(textInput);
+                break;
+            }
+            case "checkbox": {
+                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+
+                let checkboxInput = document.createElement("input");
+                checkboxInput.type = "checkbox";
+                checkboxInput.checked = objectData[setting.value] || false;
+                checkboxInput.addEventListener("change", (e) => {
+                    objectData[setting.value] = e.target.checked;
+                    selection.dataset.objectData = JSON.stringify(objectData);
+                    updateObjectList();
+
+                    if(setting.setProperty) {
+                        let propertyValue = (e.target.checked ? setting.setProperty.value : "");
+                        selection.style.setProperty(setting.setProperty.property, propertyValue);
+                    }
+                });
+
+                checkboxInput.id = "objectSetting_" + setting.value;
+                settingElement.appendChild(checkboxInput);
+                break;
+            }
+            case "select": {
+                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+
+                let selectInput = document.createElement("select");
+                for(let j = 0; j < setting.options.length; j++) {
+                    let option = setting.options[j];
+                    let optionElement = document.createElement("option");
+                    optionElement.value = option.value;
+                    optionElement.innerText = option.name;
+                    selectInput.appendChild(optionElement);
+                }
+                selectInput.value = objectData[setting.value] || setting.options[0].value;
+
+                selectInput.addEventListener("change", (e) => {
+                    objectData[setting.value] = e.target.value;
+                    selection.dataset.objectData = JSON.stringify(objectData);
+                    updateObjectList();
+
+                    if(setting.setProperty) {
+                        selection.style.setProperty(setting.setProperty.property, e.target.value);
+                    }
+                });
+
+                selectInput.id = "objectSetting_" + setting.value;
+                settingElement.appendChild(selectInput);
+                break;
+            }
+        }
+
+        let settingName = document.createElement("label");
+        settingName.classList.add("label");
+        settingName.innerText = setting.name;
+        settingName.htmlFor = "objectSetting_" + setting.value;
+        settingElement.appendChild(settingName);
+        
+        customObjectSettings.appendChild(settingElement);
+    }
 
     // e.stopImmediatePropagation();
 }
@@ -521,6 +683,9 @@ function selectionBoxDragUp() {
 }
 
 function hideSelectionBox() {
+    let customObjectSettings = document.getElementById("customObjectSettings");
+    customObjectSettings.innerHTML = "";
+
     selectionDraggingDirection = false;
     let selectionBox = document.getElementById("selectionBox");
     selectionBox.classList.remove("shown");

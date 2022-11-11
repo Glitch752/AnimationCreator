@@ -79,6 +79,7 @@ function renderFrame() {
         const object = objects[i];
         
         ctx.fillStyle = object.color || "#ffffff";
+        ctx.strokeStyle = object.color || "#ffffff";
 
         switch(object.type) {
             default: {
@@ -349,7 +350,7 @@ function getPositionsFromKeyframes(objects, time) {
             let difference = nextKeyframe.time - previousKeyframe.time;
             let progress = (time - previousKeyframe.time) / difference;
 
-            let timing = nextKeyframe.timingFunction || "easeInOut";
+            let timing = previousKeyframe.timingFunction || "easeInOut";
 
             let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress, timing);
             let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress, timing);

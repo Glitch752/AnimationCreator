@@ -920,3 +920,11 @@ body {
     font-size: 20px;
     margin-left: 20px;
 }
+
+.leftContainerTab.object-settings {
+    padding: 10px;
+}
+.object-settings .label {
+    color: white;
+    font-size: 20px;
+}

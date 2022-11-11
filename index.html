@@ -102,6 +102,8 @@
                     <option value="easeInOut">Ease-in-out</option>
                     <option value="bounce">Bounce</option>
                     <option value="elastic">Elastic</option>
+                    <option value="bounceReversed">Bounce (Reversed)</option>
+                    <option value="elasticReversed">Elastic (Reversed)</option>
                     <option value="step" data-custom="true" data-show-id="stepCount">Step</option>
                     <!-- Currently creates infinite loops, temporarily disabled. -->
                     <!-- <option value="bezier" data-custom="true" data-show-id="bezierCurve">Bezier curve</option> -->
@@ -173,9 +175,10 @@
                     </div>
                 </div>
                 <div class="leftContainerTab" data-tab="objects" id="objectsList"></div>
-                <div class="leftContainerTab" data-tab="objectSettings">
+                <div class="leftContainerTab object-settings" data-tab="objectSettings">
                     <input id="objectColor" type="color" value="#1c232b" onchange="updateObjectColor(this.value)"/>
                     <label for="objectColor" class="label">Color</label>
+                    <div id="customObjectSettings"></div>
                 </div>
             </div>
             <div class="rightNavigation" id="rightNavigation">
