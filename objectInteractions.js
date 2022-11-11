@@ -736,6 +736,15 @@ function loadObjects(objects) {
         };
 
         let type = objectElementTypes[object.type] || "div";
+
+        const dataToProperty = {
+            "size": { "property": "--size", "withPixels": true },
+            "font": { "property": "font-family" },
+            "bold": { "property": "font-weight", "value": "700" },
+            "italic": { "property": "font-style", "value": "italic" },
+            "textAlign": { "property": "text-align" },
+            "lineHeight": { "property": "line-height", "withPixels": true },
+        }
         
         frame.innerHTML += `
             <${type} class='object ${object.type}'
@@ -752,6 +761,17 @@ function loadObjects(objects) {
         if(object.type === "text") {
             let textObject = frame.lastElementChild;
             textObject.value = object.data.text || "";
+        }
+
+        for(const data in dataToProperty) {
+            if(object.data[data] !== undefined) {
+                let property = dataToProperty[data].property || data;
+                let value = object.data[data];
+                if(dataToProperty[data].value) value = value ? dataToProperty[data].value : "";
+                if(dataToProperty[data].withPixels) value += "px";
+
+                frame.lastElementChild.style.setProperty(property, value);
+            }
         }
     }
     
