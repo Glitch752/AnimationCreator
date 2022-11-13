@@ -110,7 +110,7 @@
                     <!-- <option value="bezier" data-custom="true" data-show-id="bezierCurve">Bezier curve</option> -->
                 </select>
                 <div class="keyframe-timing-custom" id="stepCount">
-                    <input class="keyframe-timing-input" type="number" id="stepCountInput" placeholder="Step count"/>
+                    <input class="keyframe-timing-input" type="number" id="stepCountInput" placeholder="Step count" onchange="changeKeyframeSteps(this)"/>
                 </div>
                 <!-- Currently creates infinite loops, temporarily disabled. -->
                 <!-- <div class="keyframe-timing-custom" id="bezierCurve">

@@ -292,7 +292,7 @@ addGlobalListener("mousemove", (e) => {
                     ${draggingObject === "text" ? `placeholder="Text..."
                     onchange="changeTextObject(this)"` : ""}
                     data-object-data='${draggingObject === "polygon" ? `${JSON.stringify(draggingObjectData)}` : ""}'
-                    ${draggingObject === "polygon" ? `data-${draggingObjectData.sides}-sides ` : ""}
+                    ${draggingObject === "polygon" ? `data-sides='${draggingObjectData.sides}' ` : ""}
                     ${draggingObject === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 ></${type}>`;
 
@@ -472,6 +472,16 @@ function clickSelection(e) {
             //     "setProperty": { "property": "letter-spacing", "withPixels": true }
             // }
             // TODO: Add text shadow
+        ],
+        "polygon": [
+            {
+                "name": "Sides",
+                "value": "sides",
+                "type": "number",
+                "min": 3,
+                "max": 10,
+                "setProperty": { "property": "data-sides", "style": false }
+            }
         ]
     };
 
@@ -501,7 +511,11 @@ function clickSelection(e) {
                             propertyValue += "px";
                         }
 
-                        selection.style.setProperty(setting.setProperty.property, propertyValue);
+                        if(setting.setProperty.style === false) {
+                            selection.setAttribute(setting.setProperty.property, propertyValue);
+                        } else {
+                            selection.style.setProperty(setting.setProperty.property, propertyValue);
+                        }
                     }
                 });
 
@@ -747,7 +761,7 @@ function loadObjects(objects) {
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
                 ${object.type === "text" ? `placeholder="Text..."
                 onchange="changeTextObject(this)"` : ""}
-                ${object.type === "polygon" ? `data-${object.data.sides}-sides` : ""}
+                ${object.type === "polygon" ? `data-sides='${object.data.sides}'` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: ${object.color || "#ffffff"};"
             ></${type}>`;

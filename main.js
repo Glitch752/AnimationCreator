@@ -54,6 +54,11 @@ function runGlobalListeners(listenerType, e) {
 function mouseDown(e) {
     runGlobalListeners("mousedown", e);
 }
+
+document.oncontextmenu = function() {
+    return false;
+}
+
 function mouseUp(e) {
     runGlobalListeners("mouseup", e);
 }

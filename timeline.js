@@ -275,10 +275,12 @@ function updateElementPositions(time) {
 
             let timing = previousKeyframe.timingFunction || "easeInOut";
 
-            let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress, timing);
-            let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress, timing);
-            let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress, timing);
-            let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress, timing);
+            let data = previousKeyframe.data;
+
+            let x = interpolate(parseFloat(previousKeyframe.data.x), parseFloat(nextKeyframe.data.x), progress, timing, data);
+            let y = interpolate(parseFloat(previousKeyframe.data.y), parseFloat(nextKeyframe.data.y), progress, timing, data);
+            let width = interpolate(parseFloat(previousKeyframe.data.width), parseFloat(nextKeyframe.data.width), progress, timing, data);
+            let height = interpolate(parseFloat(previousKeyframe.data.height), parseFloat(nextKeyframe.data.height), progress, timing, data);
 
             object.x = x;
             object.y = y;
@@ -297,7 +299,7 @@ function updateElementPositions(time) {
     setSelectionPosition(selectedElement);
 }
 
-function interpolate(a, b, t, ease = "easeInOut") {
+function interpolate(a, b, t, ease = "easeInOut", data = {}) {
     if(ease === "linear") {
         return a + (b - a) * t;
     } else if(ease === "easeInOut") {
@@ -315,8 +317,7 @@ function interpolate(a, b, t, ease = "easeInOut") {
     } else if(ease === "elasticReversed") {
         return a + (b - a) * elasticReversed(t);
     } else if(ease === "step") {
-        // TODO: Make these values come from the inputs
-        return a + (b - a) * step(t, 10);
+        return a + (b - a) * step(t, data.steps || 10);
     } else if(ease === "bezier") {
         // FIXME: Currently creates infinite loops, temporarily disabled.
         return a + (b - a) * bezier(t, 0.25, 0.1, 0.25, 1);
@@ -579,11 +580,13 @@ function clickKeyframeLine(element) {
     document.getElementById("keyframeTimingFunction").value = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.timingFunction || "easeInOut";
 }
 
-function changeKeyframeTimingFunction(element) {
+function changeKeyframeTimingFunction(element) {    
     let selected = element.children[element.selectedIndex];
     
     document.querySelectorAll(".keyframe-timing-custom.shown").forEach(e => e.classList.remove("shown"));
 
+    
+    // TODO: Make showID shown to start with if an option with it is selected before changing the option
     let custom = selected.dataset.custom === "true";
     if(custom) {
         let showID = selected.dataset.showId;
@@ -595,6 +598,16 @@ function changeKeyframeTimingFunction(element) {
     let selectedKeyframe = selectedELement.keyframes[selectedLine.index];
 
     selectedKeyframe.timingFunction = element.value;
+
+    selectedElement.dataset.keyframes = JSON.stringify(selectedELement.keyframes);
+}
+
+function changeKeyframeSteps(element) {
+    // Get the selected element's data
+    let selectedELement = lastObjectList[selectedElement.dataset.index];
+    let selectedKeyframe = selectedELement.keyframes[selectedLine.index];
+
+    selectedKeyframe.data.steps = element.value;
 
     selectedElement.dataset.keyframes = JSON.stringify(selectedELement.keyframes);
 }
