@@ -571,13 +571,41 @@ function clickKeyframeLine(element) {
 
     element.classList.add("selected");
 
-    document.getElementById("keyframeTiming").classList.add("shown");
+    let keyframeTiming = document.getElementById("keyframeTiming");
+    keyframeTiming.classList.add("shown");
 
     selectedLine = {
         index: parseInt(element.dataset.keyframe)
     };
 
-    document.getElementById("keyframeTimingFunction").value = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.timingFunction || "easeInOut";
+    let timingFunction = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.timingFunction || "easeInOut";
+    document.getElementById("keyframeTimingFunction").value = timingFunction;
+    
+    document.querySelectorAll(".keyframe-timing-custom.shown").forEach(e => e.classList.remove("shown"));
+
+    let keyframeTimingFunction = document.getElementById("keyframeTimingFunction");
+    let selected = keyframeTimingFunction.children[keyframeTimingFunction.selectedIndex];
+    let custom = selected.dataset.custom === "true";
+    if(custom) {
+        let showID = selected.dataset.showId;
+        document.getElementById(showID).classList.add("shown");
+
+        let dataIDs = {
+            "step": [
+                {
+                    id: "stepCountInput",
+                    value: "steps"
+                }
+            ]
+        };
+
+        if(dataIDs[timingFunction]) {
+            dataIDs[timingFunction].forEach(data => {
+                document.getElementById(data.id).value = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.data?.[data.value] || 1;
+                console.log(lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]);
+            });
+        }
+    }
 }
 
 function changeKeyframeTimingFunction(element) {    
@@ -585,8 +613,6 @@ function changeKeyframeTimingFunction(element) {
     
     document.querySelectorAll(".keyframe-timing-custom.shown").forEach(e => e.classList.remove("shown"));
 
-    
-    // TODO: Make showID shown to start with if an option with it is selected before changing the option
     let custom = selected.dataset.custom === "true";
     if(custom) {
         let showID = selected.dataset.showId;
