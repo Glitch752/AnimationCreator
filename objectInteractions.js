@@ -12,6 +12,16 @@ let selectionElementStartWidth = 0, selectionElementStartHeight = 0;
 
 const arrowChange = 100;
 
+let objects = [];
+
+window.onload = function() {
+    objects = JSON.parse(localStorage.getItem("objects"));
+
+    if(objects !== null) {
+        createObjects(objects);
+    }
+}
+
 // TODO: Refactor so the data isn't stored in the DOM 
 
 const objectElementTypes = {
@@ -281,23 +291,18 @@ addGlobalListener("mousemove", (e) => {
                 currentTemp.style.setProperty("--rotation", `${Math.atan2(height, width)}rad`);
             }
         } else {
-            let frame = document.getElementById("frame");
+            objects.push({
+                type:      draggingObject,
+                x:         draggingObjectStartX,
+                y:         draggingObjectStartY,
+                width:     0,
+                height:    0,
+                data:      JSON.stringify(draggingObjectData),
+                color:     "ffffff",
+                temp:      true
+            });
 
-            // let lineSide = "bottomleft"
-            let type = objectElementTypes[draggingObject] || "div";
-
-            frame.innerHTML += `
-                <${type} class='object ${draggingObject} temp'
-                    data-object-type="${draggingObject}"
-                    ${draggingObject === "text" ? `placeholder="Text..."
-                    onchange="changeTextObject(this)"` : ""}
-                    data-object-data='${draggingObject === "polygon" ? `${JSON.stringify(draggingObjectData)}` : ""}'
-                    ${draggingObject === "polygon" ? `data-sides='${draggingObjectData.sides}' ` : ""}
-                    ${draggingObject === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
-                ></${type}>`;
-
-            regenerateSelectedListeners();
-            updateObjectList();
+            createObjects(objects);
 
             currentTemp = document.querySelector(".object.temp");
 
@@ -396,7 +401,9 @@ function getSelectedAddObject() {
 let currentSelectedListeners = [];
 function regenerateSelectedListeners() {
     for(let i = 0; i < currentSelectedListeners.length; i++) {
-        currentSelectedListeners[i].removeEventListener("mousedown", clickSelection)
+        if(currentSelectedListeners[i] !== null) {
+            currentSelectedListeners[i].removeEventListener("mousedown", clickSelection);
+        }
     }
 
     currentSelectedListeners = [];
@@ -731,7 +738,7 @@ function checkDraggingTextBorder() {
     return false;
 }
 
-function loadObjects(objects) {
+function createObjects(objects) {
     document.querySelectorAll(".object").forEach(object => object.remove());
 
     let frame = document.getElementById("frame");
@@ -752,10 +759,10 @@ function loadObjects(objects) {
             "italic": { "property": "font-style", "value": "italic" },
             "textAlign": { "property": "text-align" },
             "lineHeight": { "property": "line-height", "withPixels": true },
-        }
-        
+        };
+
         frame.innerHTML += `
-            <${type} class='object ${object.type}'
+            <${type} class='object ${object.type} ${object.temp ? "temp" : ""}'
                 data-object-type="${object.type}"
                 data-object-data='${object.type === "polygon" || object.type === "text" ? `${JSON.stringify(object.data)}` : ""}'
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
@@ -763,7 +770,7 @@ function loadObjects(objects) {
                 onchange="changeTextObject(this)"` : ""}
                 ${object.type === "polygon" ? `data-sides='${object.data.sides}'` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
-                style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: ${object.color || "#ffffff"};"
+                style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: #${object.color || "ffffff"};"
             ></${type}>`;
 
         if(object.type === "text") {
@@ -783,6 +790,7 @@ function loadObjects(objects) {
         }
     }
     
+    updateObjectList();
     regenerateSelectedListeners();
 }
 
@@ -790,12 +798,6 @@ function changeTextObject(element) {
     lastObjectList[element.dataset.index].data.text = element.value;
     element.dataset.objectData = JSON.stringify(lastObjectList[element.dataset.index].data);
     updateObjectList();
-}
-
-let objects = JSON.parse(localStorage.getItem("objects"));
-
-if(objects !== null) {
-    loadObjects(objects);
 }
 
 function updateObjectColor(color) {

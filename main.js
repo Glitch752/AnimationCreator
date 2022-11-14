@@ -56,7 +56,7 @@ function mouseDown(e) {
 }
 
 document.oncontextmenu = function() {
-    return false;
+    // return false;
 }
 
 function mouseUp(e) {
