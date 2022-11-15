@@ -53,8 +53,6 @@ addNavigationSubmenuItems.forEach(addNavigationSubmenuItem => {
 function updateObjectList() {
     let objectsList = document.getElementById("objectsList");
 
-    let objects = document.querySelectorAll(".object");
-
     objectsList.innerHTML = "";
 
     const objectTypeNames = {
@@ -66,46 +64,29 @@ function updateObjectList() {
         "text": "Text"
     };
 
-    let objectList = [];
-
     for(let i = 0; i < objects.length; i++) {
-        let object = objects[i];
-        object.setAttribute("data-index", i)
-        let objectType = object.dataset.objectType;
-        objectsList.innerHTML += `<div class="objectListItem ${(selectionDraggingDirection !== false && selectedElement == object) ? "selected" : ""}" 
-            onmouseenter ="mouseEnterObjectList(this)" 
-            onmouseleave ="mouseLeaveObjectList(this)"
-            onpointerdown="mouseClickObjectList(this)"
-            data-index="${i}">
-                ${objectTypeNames[objectType] || "Unknown"}
+        objectsList.innerHTML += `<div class="objectListItem ${(selectionDraggingDirection !== false && selectedElement?.dataset?.index == objects[i]) ? "selected" : ""}" 
+            onmouseenter ="mouseEnterObjectList(${i})" 
+            onmouseleave ="mouseLeaveObjectList(${i})"
+            onpointerdown="mouseClickObjectList(${i})">
+                ${objectTypeNames[objects[i].type] || "Unknown"}
                 <span class="objectListRemove" onpointerdown="deleteObject(${i})">X</span>
         </div>`;
-
-        let objectData = object.dataset.objectData;
-        if(!objectData || objectData === "") objectData = "{}";
-
-        let objectKeyframes = object.dataset.keyframes;
-        if(!objectKeyframes || objectKeyframes === "") objectKeyframes = "[]";
-
-        objectList.push({
-            type:   objectType,
-            x:      getComputedStyle(object).getPropertyValue("--offsetX"),
-            y:      getComputedStyle(object).getPropertyValue("--offsetY"),
-            width:  getComputedStyle(object).getPropertyValue("--width"  ),
-            height: getComputedStyle(object).getPropertyValue("--height" ),
-            data:   JSON.parse(objectData),
-            color: getComputedStyle(object).getPropertyValue("--color").replace("#", "").trim() || "ffffff",
-            keyframes: JSON.parse(objectKeyframes)
-        });
     }
 
-    localStorage.setItem("objects", JSON.stringify(objectList));
+    localStorage.setItem("objects", JSON.stringify(objects));
 
-    refreshTimeline(objects, objectList);
+    refreshTimeline();
 }
 
 function deleteObject(index) {
     let originalObject = document.querySelector(`.object[data-index="${index}"]`);
+
+    objects.splice(index, 1);
+
+    createObjects(objects);
+
+    if(!originalObject) return;
 
     originalObject.remove();
 
@@ -122,11 +103,13 @@ function deleteObject(index) {
     }, 1);
 }
 
-function mouseEnterObjectList(e) {
+function mouseEnterObjectList(index) {
     let outline = document.getElementById("outline");
     outline.classList.add("shown");
 
-    let originalObject = document.querySelector(`.object[data-index="${e.dataset.index}"]`);
+    let originalObject = document.querySelector(`.object[data-index="${index}"]`);
+
+    if(!originalObject) return;
 
     outline.style.setProperty("--offsetX", getComputedStyle(originalObject).getPropertyValue("--offsetX"));
     outline.style.setProperty("--offsetY", getComputedStyle(originalObject).getPropertyValue("--offsetY"));
@@ -134,13 +117,13 @@ function mouseEnterObjectList(e) {
     outline.style.setProperty("--height",  getComputedStyle(originalObject).getPropertyValue("--height") );
 }
 
-function mouseLeaveObjectList(e) {
+function mouseLeaveObjectList() {
     let outline = document.getElementById("outline");
     outline.classList.remove("shown");
 }
 
-function mouseClickObjectList(e) {
-    let originalObject = document.querySelector(`.object[data-index="${e.dataset.index}"]`);
+function mouseClickObjectList(index) {
+    let originalObject = document.querySelector(`.object[data-index="${index}"]`);
     if(!originalObject) return;
     clickSelection({target: originalObject});
 }

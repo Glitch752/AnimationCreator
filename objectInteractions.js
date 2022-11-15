@@ -104,7 +104,7 @@ addGlobalListener("mousedown", (e) => {
         let frame = document.getElementById("frame");
 
         draggingObjectStartX = (mouseX - frame.getBoundingClientRect().left) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-        draggingObjectStartY = (mouseY - frame.getBoundingClientRect().top) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
+        draggingObjectStartY = (mouseY - frame.getBoundingClientRect().top ) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
 
         if(selectedAddObject === "polygon") {
             draggingObjectData["sides"] = document.getElementById("polygonSides").value;
@@ -154,6 +154,17 @@ addGlobalListener("mouseup", (e) => {
         if(currentTemp) {
             currentTemp.classList.remove("temp");
         }
+
+        let index = currentTemp.dataset.index;
+        let object = objects[index];
+
+        object.temp = false;
+        object.x = getComputedStyle(currentTemp).getPropertyValue("--offsetX");
+        object.y = getComputedStyle(currentTemp).getPropertyValue("--offsetY");
+        object.width = getComputedStyle(currentTemp).getPropertyValue("--width");
+        object.height = getComputedStyle(currentTemp).getPropertyValue("--height");
+        createObjects(objects);
+
         draggingObject = false;
     }
 
@@ -237,14 +248,14 @@ addGlobalListener("mousemove", (e) => {
                     break;
                 case "selection":
                     let changeY = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                    selectedElement.style.setProperty("--offsetY", selectionElementStartY + changeY + "px");
+                    objects[selectedElement.dataset.index].y = selectionElementStartY + changeY + "px";
                 
                     let changeX = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                    selectedElement.style.setProperty("--offsetX", selectionElementStartX + changeX + "px");
+                    objects[selectedElement.dataset.index].x = selectionElementStartX + changeX + "px";
                     break;
             }
             
-            setSelectionPosition(selectedElement);
+            setSelectionPosition(objects[selectedElement.dataset.index]);
         }
     } else if(mouseClicked) {
         if(checkDraggingTextBorder()) return;
@@ -305,11 +316,6 @@ addGlobalListener("mousemove", (e) => {
             createObjects(objects);
 
             currentTemp = document.querySelector(".object.temp");
-
-            currentTemp.style.setProperty("--offsetX", draggingObjectStartX + "px");
-            currentTemp.style.setProperty("--offsetY", draggingObjectStartY + "px");
-            currentTemp.style.setProperty("--width", "0px");
-            currentTemp.style.setProperty("--height", "0px");
         }
     }
 });
@@ -335,40 +341,40 @@ addGlobalListener("keydown", (e) => {
             break;
         case "ArrowUp":
             if(selectedElement !== false) {
-                let currentY = parseFloat(getComputedStyle(selectedElement).getPropertyValue("--offsetY"));
-                selectedElement.style.setProperty("--offsetY", currentY - arrowChange + "px");
-                setSelectionPosition(selectedElement);
+                let object = objects[selectedElement.dataset.index];
+                object.y = parseFloat(object.y) - arrowChange + "px";
+                setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "ArrowDown":
             if(selectedElement !== false) {
-                let currentY = parseFloat(getComputedStyle(selectedElement).getPropertyValue("--offsetY"));
-                selectedElement.style.setProperty("--offsetY", currentY + arrowChange + "px");
-                setSelectionPosition(selectedElement);
+                let object = objects[selectedElement.dataset.index];
+                object.y = parseFloat(object.y) + arrowChange + "px";
+                setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "ArrowLeft":
             if(selectedElement !== false) {
-                let currentX = parseFloat(getComputedStyle(selectedElement).getPropertyValue("--offsetX"));
-                selectedElement.style.setProperty("--offsetX", currentX - arrowChange + "px");
-                setSelectionPosition(selectedElement);
+                let object = objects[selectedElement.dataset.index];
+                object.x = parseFloat(object.x) - arrowChange + "px";
+                setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "ArrowRight":
             if(selectedElement !== false) {
-                let currentX = parseFloat(getComputedStyle(selectedElement).getPropertyValue("--offsetX"));
-                selectedElement.style.setProperty("--offsetX", currentX + arrowChange + "px");
-                setSelectionPosition(selectedElement);
+                let object = objects[selectedElement.dataset.index];
+                object.x = parseFloat(object.x) + arrowChange + "px";
+                setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "Backspace":
         case "Delete":
             if(markerSelected !== null) return;
             if(selectedElement !== false) {
-                selectedElement.remove();
+                objects.splice(selectedElement.dataset.index, 1);
                 selectedElement = false;
                 hideSelectionBox();
-                updateObjectList();
+                createObjects(objects);
             }
             break;
         default:
@@ -426,7 +432,7 @@ function clickSelection(e) {
 
     selectedElement = selection;
 
-    setSelectionPosition(selection);
+    setSelectionPosition(objects[selectedElement.dataset.index]);
     selectionBoxDragDown(null);
 
     let colorPicker = document.getElementById("objectColor");
@@ -622,24 +628,25 @@ function setSelectionPosition(selection) {
 
     if(!selection) return;
 
-    if(selection.dataset.objectType !== "line") {
-        selectionBox.style.setProperty("--offsetX", selection.style.getPropertyValue("--offsetX"));
-        selectionBox.style.setProperty("--offsetY", selection.style.getPropertyValue("--offsetY"));
-        selectionBox.style.setProperty("--width",   selection.style.getPropertyValue("--width")  );
-        selectionBox.style.setProperty("--height",  selection.style.getPropertyValue("--height") );
+    if(selection.type !== "line") {
+        selectionBox.style.setProperty("--offsetX", selection.x     );
+        selectionBox.style.setProperty("--offsetY", selection.y     );
+        selectionBox.style.setProperty("--width",   selection.width );
+        selectionBox.style.setProperty("--height",  selection.height);
     } else {
-        let offsetX = parseFloat(selection.style.getPropertyValue("--offsetX"));
-        let sideOffsetX = Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"));
-        if(sideOffsetX < 0) offsetX += sideOffsetX;
+        // TODO: When implementing line editing, make sure to update this
+        // let offsetX = parseFloat(selection.x);
+        // let sideOffsetX = Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"));
+        // if(sideOffsetX < 0) offsetX += sideOffsetX;
 
-        let offsetY = parseFloat(selection.style.getPropertyValue("--offsetY"));
-        let sideOffsetY = Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"));
-        if(sideOffsetY < 0) offsetY += sideOffsetY;
+        // let offsetY = parseFloat(selection.style.getPropertyValue("--offsetY"));
+        // let sideOffsetY = Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"));
+        // if(sideOffsetY < 0) offsetY += sideOffsetY;
 
-        selectionBox.style.setProperty("--offsetX", offsetX + "px");
-        selectionBox.style.setProperty("--offsetY", offsetY + "px");
-        selectionBox.style.setProperty("--width",   Math.abs(Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
-        selectionBox.style.setProperty("--height",  Math.abs(Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
+        // selectionBox.style.setProperty("--offsetX", offsetX + "px");
+        // selectionBox.style.setProperty("--offsetY", offsetY + "px");
+        // selectionBox.style.setProperty("--width",   Math.abs(Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
+        // selectionBox.style.setProperty("--height",  Math.abs(Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
     }
 
     if(markerSelected !== null) {
@@ -647,14 +654,18 @@ function setSelectionPosition(selection) {
         newKeyframes = JSON.parse(newKeyframes);
 
         newKeyframes[markerSelected.marker].data = {
-            "x": selection.style.getPropertyValue("--offsetX"),
-            "y": selection.style.getPropertyValue("--offsetY"),
-            "width": selection.style.getPropertyValue("--width"),
-            "height": selection.style.getPropertyValue("--height")
+            "x": selection.x,
+            "y": selection.y,
+            "width": selection.width,
+            "height": selection.height
         };
 
         selection.dataset.keyframes = JSON.stringify(newKeyframes);
     }
+
+    updateObjectList();
+
+    createObjects(objects);
 }
 
 // let selectionBoxDragRegions = document.querySelectorAll(".selectionBoxDragRegion");
@@ -738,7 +749,24 @@ function checkDraggingTextBorder() {
     return false;
 }
 
+let oldElements = 0;
+
+// TODO: Optimize so this doesn't have to remove all the objects and re-add them if nothing changed
 function createObjects(objects) {
+    if(oldElements === objects.length) {
+        for(let i = 0; i < objects.length; i++) {
+            let object = document.querySelector(`.object[data-index="${i}"]`);
+            if(object) {
+                object.style.setProperty("--offsetX", objects[i].x);
+                object.style.setProperty("--offsetY", objects[i].y);
+                object.style.setProperty("--width",   objects[i].width);
+                object.style.setProperty("--height",  objects[i].height);
+            }
+        }
+        return;
+    }
+    oldElements = objects.length;
+
     document.querySelectorAll(".object").forEach(object => object.remove());
 
     let frame = document.getElementById("frame");
@@ -764,6 +792,7 @@ function createObjects(objects) {
         frame.innerHTML += `
             <${type} class='object ${object.type} ${object.temp ? "temp" : ""}'
                 data-object-type="${object.type}"
+                data-index="${i}"
                 data-object-data='${object.type === "polygon" || object.type === "text" ? `${JSON.stringify(object.data)}` : ""}'
                 data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
                 ${object.type === "text" ? `placeholder="Text..."
@@ -795,8 +824,8 @@ function createObjects(objects) {
 }
 
 function changeTextObject(element) {
-    lastObjectList[element.dataset.index].data.text = element.value;
-    element.dataset.objectData = JSON.stringify(lastObjectList[element.dataset.index].data);
+    objects[element.dataset.index].data.text = element.value;
+    element.dataset.objectData = JSON.stringify(objects[element.dataset.index].data);
     updateObjectList();
 }
 

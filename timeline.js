@@ -6,17 +6,11 @@ let totalMinutes = localStorage.getItem("duration") || 2;
 
 let markerSelected = null;
 
-let lastObjects = [];
-let lastObjectList = [];
-
 let playingTimeline = false;
 
 // FIXME: This code creates a lot of forced reflows, which is bad for performance
 
-function refreshTimeline(objects, objectList) {
-    lastObjects = objects;
-    lastObjectList = objectList;
-
+function refreshTimeline() {
     let timeline = document.getElementById("timeline");
 
     let times = "";
@@ -67,7 +61,7 @@ function refreshTimeline(objects, objectList) {
                         </svg>
                     </div>
 
-                    ${Array.from(objects).includes(selectedElement) ? `<svg class="keyframe-editor-button" onpointerdown="openKeyrameEditor()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    ${selectedElement ? `<svg class="keyframe-editor-button" onpointerdown="openKeyrameEditor()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                         <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
                         <path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/>
                     </svg>` : ""}
@@ -88,7 +82,7 @@ function refreshTimeline(objects, objectList) {
 
         let markers = ``;
 
-        let keyframes = JSON.parse(object.dataset.keyframes || "[]");
+        let keyframes = object.keyframes || [];
 
         for(let j = 0; j < keyframes.length; j++) {
             const marker = keyframes[j];
@@ -100,7 +94,7 @@ function refreshTimeline(objects, objectList) {
         
         timeline.innerHTML += `
             <div class="timeline-column">
-                <div class="timeline-column-line ${(selectedElement == object) ? "selected" : ""}">
+                <div class="timeline-column-line ${(selectedElement?.dataset?.index === object) ? "selected" : ""}">
                     ${markers}
                 </div>
             </div>
@@ -140,7 +134,7 @@ addGlobalListener("mousemove", function(e) {
         let oldMarkerSelected = markerSelected;
         markerSelected = null;
         if(oldMarkerSelected !== null) {
-            refreshTimeline(lastObjects, lastObjectList);
+            refreshTimeline();
         }
 
         updateElementPositions(distance / 19);
@@ -195,13 +189,13 @@ addGlobalListener("keydown", function(e) {
         case "Delete":
         case "Backspace": {
             if(markerSelected !== null) {
-                let currentKeyframes = lastObjects[markerSelected.object].dataset.keyframes;
+                let currentKeyframes = objects[markerSelected.object].dataset.keyframes;
                 if(currentKeyframes === undefined) currentKeyframes = "[]";
                 currentKeyframes = JSON.parse(currentKeyframes);
 
                 currentKeyframes.splice(markerSelected.marker, 1);
 
-                lastObjects[markerSelected.object].dataset.keyframes = JSON.stringify(currentKeyframes);
+                objects[markerSelected.object].dataset.keyframes = JSON.stringify(currentKeyframes);
 
                 markerSelected = null;
                 updateObjectList();
@@ -234,8 +228,8 @@ function updateDuration() {
 }
 
 function updateElementPositions(time) {
-    for(let i = 0; i < lastObjectList.length; i++) {
-        const object = lastObjectList[i];
+    for(let i = 0; i < objects.length; i++) {
+        const object = objects[i];
         let keyframes = object.keyframes;
 
         let previousKeyframe = null;
@@ -296,7 +290,7 @@ function updateElementPositions(time) {
     }
 
     if(selectedElement === false) return;
-    setSelectionPosition(selectedElement);
+    setSelectionPosition(objects[selectedElement.dataset.index]);
 }
 
 function interpolate(a, b, t, ease = "easeInOut", data = {}) {
@@ -426,7 +420,7 @@ function mouseDownMarker(object, marker, time) {
     timelineMarker.style.setProperty("--distance", (time * 19) + "px");
 
     updateElementPositions(time);
-    clickSelection({target: lastObjects[object]});
+    clickSelection({target: document.querySelector(`.object[data-index="${object}"]`)});
 }
 
 let playingInterval = null;
@@ -478,7 +472,7 @@ function refreshKeyframeEditor() {
     
     document.getElementById("keyframeTiming").classList.remove("shown");
 
-    let objectData = lastObjectList[selectedElement.dataset.index];
+    let objectData = objects[selectedElement.dataset.index];
     let keyframeData = objectData.keyframes.map(k => {
         return {time: k.time, data: k.data[keyframe]};
     });
@@ -578,7 +572,7 @@ function clickKeyframeLine(element) {
         index: parseInt(element.dataset.keyframe)
     };
 
-    let timingFunction = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.timingFunction || "easeInOut";
+    let timingFunction = objects[selectedElement.dataset.index].keyframes[selectedLine.index]?.timingFunction || "easeInOut";
     document.getElementById("keyframeTimingFunction").value = timingFunction;
     
     document.querySelectorAll(".keyframe-timing-custom.shown").forEach(e => e.classList.remove("shown"));
@@ -601,8 +595,7 @@ function clickKeyframeLine(element) {
 
         if(dataIDs[timingFunction]) {
             dataIDs[timingFunction].forEach(data => {
-                document.getElementById(data.id).value = lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]?.data?.[data.value] || 1;
-                console.log(lastObjectList[selectedElement.dataset.index].keyframes[selectedLine.index]);
+                document.getElementById(data.id).value = objects[selectedElement.dataset.index].keyframes[selectedLine.index]?.data?.[data.value] || 1;
             });
         }
     }
@@ -620,7 +613,7 @@ function changeKeyframeTimingFunction(element) {
     }
 
     // Get the selected element's data
-    let selectedELement = lastObjectList[selectedElement.dataset.index];
+    let selectedELement = objects[selectedElement.dataset.index];
     let selectedKeyframe = selectedELement.keyframes[selectedLine.index];
 
     selectedKeyframe.timingFunction = element.value;
@@ -630,7 +623,7 @@ function changeKeyframeTimingFunction(element) {
 
 function changeKeyframeSteps(element) {
     // Get the selected element's data
-    let selectedELement = lastObjectList[selectedElement.dataset.index];
+    let selectedELement = objects[selectedElement.dataset.index];
     let selectedKeyframe = selectedELement.keyframes[selectedLine.index];
 
     selectedKeyframe.data.steps = element.value;
