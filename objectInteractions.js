@@ -22,8 +22,6 @@ window.onload = function() {
     }
 }
 
-// TODO: Refactor so the data isn't stored in the DOM 
-
 const objectElementTypes = {
     "text": "textarea"
 };
@@ -748,7 +746,6 @@ function checkDraggingTextBorder() {
 
 let oldElements = 0;
 
-// TODO: Optimize so this doesn't have to remove all the objects and re-add them if nothing changed
 function createObjects(objects) {
     if(oldElements === objects.length) {
         for(let i = 0; i < objects.length; i++) {
@@ -788,11 +785,9 @@ function createObjects(objects) {
 
         frame.innerHTML += `
             <${type} class='object ${object.type} ${object.temp ? "temp" : ""}'
-                data-object-type="${object.type}"
                 data-index="${i}"
-                data-object-data='${object.type === "polygon" || object.type === "text" ? `${JSON.stringify(object.data)}` : ""}'
                 ${object.type === "text" ? `placeholder="Text..."
-                onchange="changeTextObject(this)"` : ""}
+                onchange="changeTextObject(this)"` : ""}5
                 ${object.type === "polygon" ? `data-sides='${object.data.sides}'` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
                 style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: #${object.color || "ffffff"};"
