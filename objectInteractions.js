@@ -176,7 +176,7 @@ addGlobalListener("mousemove", (e) => {
     mouseY = e.clientY;
 
     if(selectionDraggingDirection !== false) {
-        if(selectedElement.dataset.objectType === "line") {
+        if(objects[selectedElement.dataset.index].type === "line") {
             switch(selectionDraggingDirection) {
                 case "left":
                     break;
@@ -184,36 +184,36 @@ addGlobalListener("mousemove", (e) => {
         } else {
             let changeLeft = () => {
                 let change = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--offsetX", selectionElementStartX + change + "px");
-                selectedElement.style.setProperty("--width"  , selectionElementStartWidth - change + "px");
+                selectedElement.style.setProperty("--offsetX", selectionElementStartX + change);
+                selectedElement.style.setProperty("--width"  , selectionElementStartWidth - change);
                 
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--height" , selectionElementStartWidth - change + "px");
+                    selectedElement.style.setProperty("--height" , selectionElementStartWidth - change);
                 }
             }
             let changeTop = () => {
                 let change = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--offsetY", selectionElementStartY + change + "px");
-                selectedElement.style.setProperty("--height" , selectionElementStartHeight - change + "px");
+                selectedElement.style.setProperty("--offsetY", selectionElementStartY + change);
+                selectedElement.style.setProperty("--height" , selectionElementStartHeight - change);
             
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--width" , selectionElementStartHeight - change + "px");
+                    selectedElement.style.setProperty("--width" , selectionElementStartHeight - change);
                 }
             }
             let changeRight = () => {
                 let change = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--width"  , selectionElementStartWidth + change + "px");
+                selectedElement.style.setProperty("--width"  , selectionElementStartWidth + change);
                 
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--height" , selectionElementStartWidth + change + "px");
+                    selectedElement.style.setProperty("--height" , selectionElementStartWidth + change);
                 }
             }
             let changeBottom = () => {
                 let change = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--height" , selectionElementStartHeight + change + "px");
+                selectedElement.style.setProperty("--height" , selectionElementStartHeight + change);
 
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--width" , selectionElementStartHeight + change + "px");
+                    selectedElement.style.setProperty("--width" , selectionElementStartHeight + change);
                 }
             }
 
@@ -248,10 +248,10 @@ addGlobalListener("mousemove", (e) => {
                     break;
                 case "selection":
                     let changeY = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                    objects[selectedElement.dataset.index].y = selectionElementStartY + changeY + "px";
+                    objects[selectedElement.dataset.index].y = selectionElementStartY + changeY;
                 
                     let changeX = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                    objects[selectedElement.dataset.index].x = selectionElementStartX + changeX + "px";
+                    objects[selectedElement.dataset.index].x = selectionElementStartX + changeX;
                     break;
             }
             
@@ -277,25 +277,25 @@ addGlobalListener("mousemove", (e) => {
             
             if(draggingObject !== "line") {
                 if(width < 0) {
-                    currentTemp.style.setProperty("--offsetX", draggingObjectStartX + width + "px");
+                    currentTemp.style.setProperty("--offsetX", draggingObjectStartX + width);
                     width *= -1;
                 } else {
-                    currentTemp.style.setProperty("--offsetX", draggingObjectStartX + "px");
+                    currentTemp.style.setProperty("--offsetX", draggingObjectStartX);
                 }
     
                 if(height < 0) {
-                    currentTemp.style.setProperty("--offsetY", draggingObjectStartY + height + "px");
+                    currentTemp.style.setProperty("--offsetY", draggingObjectStartY + height);
                     height *= -1;
                 } else {
-                    currentTemp.style.setProperty("--offsetY", draggingObjectStartY + "px");
+                    currentTemp.style.setProperty("--offsetY", draggingObjectStartY);
                 }
             } else {
-                currentTemp.style.setProperty("--offsetX", draggingObjectStartX + "px");
-                currentTemp.style.setProperty("--offsetY", draggingObjectStartY + "px");
+                currentTemp.style.setProperty("--offsetX", draggingObjectStartX);
+                currentTemp.style.setProperty("--offsetY", draggingObjectStartY);
             }
 
-            currentTemp.style.setProperty("--width",  width  + "px");
-            currentTemp.style.setProperty("--height", height + "px");
+            currentTemp.style.setProperty("--width",  width);
+            currentTemp.style.setProperty("--height", height);
 
             if(draggingObject === "line") {
                 currentTemp.style.setProperty("--size", `${distance(draggingObjectStartX, draggingObjectStartY, draggingObjectStartX + width, draggingObjectStartY + height)}px`);
@@ -308,7 +308,7 @@ addGlobalListener("mousemove", (e) => {
                 y:         draggingObjectStartY,
                 width:     0,
                 height:    0,
-                data:      JSON.stringify(draggingObjectData),
+                data:      draggingObjectData,
                 color:     "ffffff",
                 temp:      true
             });
@@ -342,28 +342,28 @@ addGlobalListener("keydown", (e) => {
         case "ArrowUp":
             if(selectedElement !== false) {
                 let object = objects[selectedElement.dataset.index];
-                object.y = parseFloat(object.y) - arrowChange + "px";
+                object.y = parseFloat(object.y) - arrowChange;
                 setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "ArrowDown":
             if(selectedElement !== false) {
                 let object = objects[selectedElement.dataset.index];
-                object.y = parseFloat(object.y) + arrowChange + "px";
+                object.y = parseFloat(object.y) + arrowChange;
                 setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "ArrowLeft":
             if(selectedElement !== false) {
                 let object = objects[selectedElement.dataset.index];
-                object.x = parseFloat(object.x) - arrowChange + "px";
+                object.x = parseFloat(object.x) - arrowChange;
                 setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
         case "ArrowRight":
             if(selectedElement !== false) {
                 let object = objects[selectedElement.dataset.index];
-                object.x = parseFloat(object.x) + arrowChange + "px";
+                object.x = parseFloat(object.x) + arrowChange;
                 setSelectionPosition(objects[selectedElement.dataset.index]);
             }
             break;
@@ -498,7 +498,7 @@ function clickSelection(e) {
         ]
     };
 
-    let customSettings = objectTypeCustomSettings[selection.dataset.objectType] || [];
+    let customSettings = objectTypeCustomSettings[objects[selection.dataset.index].type] || [];
     for(let i = 0; i < customSettings.length; i++) {
         let setting = customSettings[i];
         let settingElement = document.createElement("div");
@@ -506,7 +506,7 @@ function clickSelection(e) {
 
         switch(setting.type) {
             case "number": {
-                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+                let objectData = objects[selection.dataset.index].data || {};
 
                 let numberInput = document.createElement("input");
                 numberInput.type = "number";
@@ -537,14 +537,13 @@ function clickSelection(e) {
                 break;
             }
             case "text": {
-                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+                let objectData = objects[selection.dataset.index].data || {};
 
                 let textInput = document.createElement("input");
                 textInput.type = "text";
                 textInput.value = objectData[setting.value] || "";
                 textInput.addEventListener("change", (e) => {
                     objectData[setting.value] = e.target.value;
-                    selection.dataset.objectData = JSON.stringify(objectData);
                     updateObjectList();
 
                     if(setting.setProperty) {
@@ -557,7 +556,7 @@ function clickSelection(e) {
                 break;
             }
             case "checkbox": {
-                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+                let objectData = objects[selection.dataset.index].data || {};
 
                 let checkboxInput = document.createElement("input");
                 checkboxInput.type = "checkbox";
@@ -578,7 +577,7 @@ function clickSelection(e) {
                 break;
             }
             case "select": {
-                let objectData = JSON.parse(selection.dataset.objectData || "{}");
+                let objectData = objects[selection.dataset.index].data || {};
 
                 let selectInput = document.createElement("select");
                 for(let j = 0; j < setting.options.length; j++) {
@@ -643,15 +642,15 @@ function setSelectionPosition(selection) {
         // let sideOffsetY = Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"));
         // if(sideOffsetY < 0) offsetY += sideOffsetY;
 
-        // selectionBox.style.setProperty("--offsetX", offsetX + "px");
-        // selectionBox.style.setProperty("--offsetY", offsetY + "px");
-        // selectionBox.style.setProperty("--width",   Math.abs(Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
-        // selectionBox.style.setProperty("--height",  Math.abs(Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))) + "px");
+        // selectionBox.style.setProperty("--offsetX", offsetX);
+        // selectionBox.style.setProperty("--offsetY", offsetY);
+        // selectionBox.style.setProperty("--width",   Math.abs(Math.cos(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))));
+        // selectionBox.style.setProperty("--height",  Math.abs(Math.sin(parseFloat(selection.style.getPropertyValue("--rotation"))) * parseFloat(selection.style.getPropertyValue("--size"))));
     }
 
     if(markerSelected !== null) {
-        let newKeyframes = selection.dataset.keyframes || "[]";
-        newKeyframes = JSON.parse(newKeyframes);
+        let newKeyframes = objects[selection.dataset.index].keyframes;
+        if(!newKeyframes) newKeyframes = [];
 
         newKeyframes[markerSelected.marker].data = {
             "x": selection.x,
@@ -659,8 +658,6 @@ function setSelectionPosition(selection) {
             "width": selection.width,
             "height": selection.height
         };
-
-        selection.dataset.keyframes = JSON.stringify(newKeyframes);
     }
 
     updateObjectList();
@@ -794,7 +791,6 @@ function createObjects(objects) {
                 data-object-type="${object.type}"
                 data-index="${i}"
                 data-object-data='${object.type === "polygon" || object.type === "text" ? `${JSON.stringify(object.data)}` : ""}'
-                data-keyframes='${JSON.stringify(object.keyframes) || "[]"}'
                 ${object.type === "text" ? `placeholder="Text..."
                 onchange="changeTextObject(this)"` : ""}
                 ${object.type === "polygon" ? `data-sides='${object.data.sides}'` : ""}
@@ -825,7 +821,6 @@ function createObjects(objects) {
 
 function changeTextObject(element) {
     objects[element.dataset.index].data.text = element.value;
-    element.dataset.objectData = JSON.stringify(objects[element.dataset.index].data);
     updateObjectList();
 }
 
