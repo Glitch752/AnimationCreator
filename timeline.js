@@ -8,8 +8,6 @@ let markerSelected = null;
 
 let playingTimeline = false;
 
-// FIXME: This code creates a lot of forced reflows, which is bad for performance
-
 function refreshTimeline() {
     let timeline = document.getElementById("timeline");
 

@@ -180,38 +180,44 @@ addGlobalListener("mousemove", (e) => {
                     break;
             }
         } else {
+            let dragging = objects[selectedElement.dataset.index];
+
             let changeLeft = () => {
                 let change = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--offsetX", selectionElementStartX + change);
-                selectedElement.style.setProperty("--width"  , selectionElementStartWidth - change);
+                
+                dragging.x = selectionElementStartX + change;
+                dragging.width = selectionElementStartWidth - change;
                 
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--height" , selectionElementStartWidth - change);
+                    dragging.height = dragging.width;
                 }
             }
             let changeTop = () => {
                 let change = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--offsetY", selectionElementStartY + change);
-                selectedElement.style.setProperty("--height" , selectionElementStartHeight - change);
+                
+                dragging.y = selectionElementStartY + change;
+                dragging.height = selectionElementStartHeight - change;
             
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--width" , selectionElementStartHeight - change);
+                    dragging.width = dragging.height;
                 }
             }
             let changeRight = () => {
                 let change = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--width"  , selectionElementStartWidth + change);
+                
+                dragging.width = selectionElementStartWidth + change;
                 
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--height" , selectionElementStartWidth + change);
+                    dragging.height = dragging.width;
                 }
             }
             let changeBottom = () => {
                 let change = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                selectedElement.style.setProperty("--height" , selectionElementStartHeight + change);
+                
+                dragging.height = selectionElementStartHeight + change;
 
                 if(keysHeld["Shift"]) {
-                    selectedElement.style.setProperty("--width" , selectionElementStartHeight + change);
+                    dragging.width = dragging.height;
                 }
             }
 
@@ -246,14 +252,14 @@ addGlobalListener("mousemove", (e) => {
                     break;
                 case "selection":
                     let changeY = (mouseY - selectionDraggingStartY) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                    objects[selectedElement.dataset.index].y = selectionElementStartY + changeY;
+                    dragging.y = selectionElementStartY + changeY;
                 
                     let changeX = (mouseX - selectionDraggingStartX) / parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--current-scale"));
-                    objects[selectedElement.dataset.index].x = selectionElementStartX + changeX;
+                    dragging.x = selectionElementStartX + changeX;
                     break;
             }
             
-            setSelectionPosition(objects[selectedElement.dataset.index]);
+            setSelectionPosition(dragging);
         }
     } else if(mouseClicked) {
         if(checkDraggingTextBorder()) return;
