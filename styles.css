@@ -398,10 +398,10 @@ body {
 
 .outline {
     position: absolute;
-    left: calc(var(--offsetX) * var(--current-scale));
-    top: calc(var(--offsetY) * var(--current-scale));
-    width: calc(var(--width) * var(--current-scale));
-    height: calc(var(--height) * var(--current-scale));
+    left: calc(var(--offsetX) * var(--current-scale) * 1px);
+    top: calc(var(--offsetY) * var(--current-scale) * 1px);
+    width: calc(var(--width) * var(--current-scale) * 1px);
+    height: calc(var(--height) * var(--current-scale) * 1px);
 
     --outline-color: #36789f;
 
