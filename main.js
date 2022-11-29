@@ -45,6 +45,7 @@ function addGlobalListener(listenerType, callback) {
 }
 
 function runGlobalListeners(listenerType, e) {
+    if(!globalListeners[listenerType]) return;
     for (let i = 0; i < globalListeners[listenerType].length; i++) {
         const globalListener = globalListeners[listenerType][i];
         globalListener(e);

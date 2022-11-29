@@ -440,7 +440,7 @@ function clickSelection(e) {
     selectionBoxDragDown(null);
 
     let colorPicker = document.getElementById("objectColor");
-    colorPicker.value = getComputedStyle(selection).getPropertyValue("--color").trim() || "#ffffff";
+    colorPicker.value = ("#" + getComputedStyle(selection).getPropertyValue("--color").trim().replace("#", "")) || "#ffffff";
 
     let customObjectSettings = document.getElementById("customObjectSettings");
     customObjectSettings.innerHTML = "";
@@ -802,7 +802,7 @@ function createObjects(objects) {
                 onchange="changeTextObject(this)"` : ""}5
                 ${object.type === "polygon" ? `data-sides='${object.data.sides}'` : ""}
                 ${object.type === "line" ? `style="--rotation: 0rad; --size: 0px"` : ""}
-                style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: #${object.color || "ffffff"};"
+                style="--offsetX: ${object.x}; --offsetY: ${object.y}; --width: ${object.width}; --height: ${object.height}; --color: #${object.color.trim().replace("#", "") || "ffffff"};"
             ></${type}>`;
 
         if(object.type === "text") {
@@ -835,6 +835,7 @@ function updateObjectColor(color) {
     if(selectedElement === false) return;
 
     selectedElement.style.setProperty("--color", color);
+    objects[selectedElement.dataset.index].color = color;
 }
 
 function clearSelection() {

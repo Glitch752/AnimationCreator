@@ -70,6 +70,8 @@ function updateObjectList() {
         "text": "Text"
     };
 
+    if(!objects) objects = [];
+
     for(let i = 0; i < objects.length; i++) {
         objectsList.innerHTML += `<div class="objectListItem 
                 ${(selectionDraggingDirection !== false && selectedElement?.dataset?.index == objects[i]) ? "selected" : ""}
