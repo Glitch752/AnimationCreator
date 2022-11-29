@@ -751,9 +751,11 @@ function checkDraggingTextBorder() {
 }
 
 let oldElements = 0;
+let oldIsolated = 0;
+let oldIsolatedOn = 0;
 
 function createObjects(objects) {
-    if(oldElements === objects.length) {
+    if(oldElements === objects.length && !(isolationModeOn || oldIsolated !== isolatedObjects.length) && oldIsolatedOn === isolationModeOn) {
         for(let i = 0; i < objects.length; i++) {
             let object = document.querySelector(`.object[data-index="${i}"]`);
             if(object) {
@@ -766,12 +768,16 @@ function createObjects(objects) {
         return;
     }
     oldElements = objects.length;
+    oldIsolated = isolatedObjects.length;
+    oldIsolatedOn = isolationModeOn;
 
     document.querySelectorAll(".object").forEach(object => object.remove());
 
     let frame = document.getElementById("frame");
 
     for (let i = 0; i < objects.length; i++) {
+        if(isolationModeOn && isolatedObjects.indexOf(i) === -1) continue;
+
         const object = objects[i];
 
         const objectElementTypes = {

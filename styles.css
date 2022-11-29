@@ -385,6 +385,9 @@ body {
 .objectListItem.selected {
     background-color: #4f565e;
 }
+.objectListItem.isolating {
+    background-color: #596879;
+}
 .objectListRemove {
     position: absolute;
     right: 5px;
@@ -938,4 +941,14 @@ body {
 }
 .error-box.shown {
     display: block;
+}
+
+.objectListHeaderButton {
+    border: none;
+    outline: none;
+    background-color: #30a091;
+    color: white;
+    padding: 5px;
+    margin: 5px;
+    font-size: 16px;
 }

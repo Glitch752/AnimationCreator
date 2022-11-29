@@ -13,6 +13,10 @@ function refreshTimeline() {
 
     let times = "";
 
+    let newObjects = objects.filter((object, index) => !isolationModeOn || isolatedObjects.includes(index));
+    // Make an array of all the indexes of non-isolated objects
+    let nonIsolatedObjects = objects.map((object, index) => index).filter(index => !isolationModeOn || isolatedObjects.includes(index));
+
     for (let i = 0; i < totalMinutes; i++) {
         let seconds = 60;
         if(i === Math.ceil(totalMinutes) - 1) {
@@ -34,10 +38,10 @@ function refreshTimeline() {
     }
 
     let headers = ``;
-    for(let i = 0; i < objects.length; i++) {
+    for(let i = 0; i < newObjects.length; i++) {
         headers += `
             <div class="timeline-column-header">
-                <div class="timeline-column-header-title" onpointerdown="clickObjectHeader(${i})">${i}</div>
+                <div class="timeline-column-header-title" onpointerdown="clickObjectHeader(${nonIsolatedObjects[i]})">${nonIsolatedObjects[i] + 1}</div>
             </div>
         `;
     }
@@ -75,8 +79,8 @@ function refreshTimeline() {
         </div>
     `;
 
-    for (let i = 0; i < objects.length; i++) {
-        const object = objects[i];
+    for (let i = 0; i < newObjects.length; i++) {
+        const object = newObjects[i];
 
         let markers = ``;
         
@@ -86,13 +90,13 @@ function refreshTimeline() {
             const marker = keyframes[j];
 
             markers += `
-                <div class="timeline-column-line-marker ${(markerSelected !== null && i === markerSelected.object && j === markerSelected.marker) ? "selected" : ""}" style="--height: ${marker.time}" onpointerdown="mouseDownMarker(${i}, ${j}, ${marker.time})"></div>
+                <div class="timeline-column-line-marker ${(markerSelected !== null && nonIsolatedObjects[i] === markerSelected.object && j === markerSelected.marker) ? "selected" : ""}" style="--height: ${marker.time}" onpointerdown="mouseDownMarker(${nonIsolatedObjects[i]}, ${j}, ${marker.time})"></div>
             `;
         }
         
         timeline.innerHTML += `
             <div class="timeline-column">
-                <div class="timeline-column-line ${(parseInt(selectedElement?.dataset?.index) === i) ? "selected" : ""}">
+                <div class="timeline-column-line ${(parseInt(selectedElement?.dataset?.index) === nonIsolatedObjects[i]) ? "selected" : ""}">
                     ${markers}
                 </div>
             </div>

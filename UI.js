@@ -2,6 +2,9 @@ let navigationTabSelected = "add";
 let rightNavigationButtons = document.querySelectorAll(".rightNavigationButton");
 rightNavigationButtons.forEach(button => { button.addEventListener("click", selectTab.bind(null, button)) });
 
+let isolationModeOn = false;
+let isolatedObjects = [];
+
 function selectTab(button) {
     tab = button.dataset.tab;
 
@@ -53,7 +56,10 @@ addNavigationSubmenuItems.forEach(addNavigationSubmenuItem => {
 function updateObjectList() {
     let objectsList = document.getElementById("objectsList");
 
-    objectsList.innerHTML = "";
+    objectsList.innerHTML = `
+        <div class="objectListHeader">
+            <button class="objectListHeaderButton" onPointerUp="toggleIsolationMode(this)">${isolationModeOn ? "Do not isolate" : "Isolate"}</button>
+        </div>`;
 
     const objectTypeNames = {
         "rectangle": "Rectangle",
@@ -65,7 +71,10 @@ function updateObjectList() {
     };
 
     for(let i = 0; i < objects.length; i++) {
-        objectsList.innerHTML += `<div class="objectListItem ${(selectionDraggingDirection !== false && selectedElement?.dataset?.index == objects[i]) ? "selected" : ""}" 
+        objectsList.innerHTML += `<div class="objectListItem 
+                ${(selectionDraggingDirection !== false && selectedElement?.dataset?.index == objects[i]) ? "selected" : ""}
+                ${isolationModeOn && isolatedObjects.includes(i) ? "isolating" : ""}"
+            " 
             onmouseenter ="mouseEnterObjectList(${i})" 
             onmouseleave ="mouseLeaveObjectList(${i})"
             onpointerdown="mouseClickObjectList(${i})">
@@ -107,14 +116,10 @@ function mouseEnterObjectList(index) {
     let outline = document.getElementById("outline");
     outline.classList.add("shown");
 
-    let originalObject = document.querySelector(`.object[data-index="${index}"]`);
-
-    if(!originalObject) return;
-
-    outline.style.setProperty("--offsetX", getComputedStyle(originalObject).getPropertyValue("--offsetX"));
-    outline.style.setProperty("--offsetY", getComputedStyle(originalObject).getPropertyValue("--offsetY"));
-    outline.style.setProperty("--width",   getComputedStyle(originalObject).getPropertyValue("--width")  );
-    outline.style.setProperty("--height",  getComputedStyle(originalObject).getPropertyValue("--height") );
+    outline.style.setProperty("--offsetX", objects[index].x     );
+    outline.style.setProperty("--offsetY", objects[index].y     );
+    outline.style.setProperty("--width",   objects[index].width );
+    outline.style.setProperty("--height",  objects[index].height);
 }
 
 function mouseLeaveObjectList() {
@@ -123,6 +128,18 @@ function mouseLeaveObjectList() {
 }
 
 function mouseClickObjectList(index) {
+    if(isolationModeOn) {
+        if(isolatedObjects.includes(index)) {
+            isolatedObjects.splice(isolatedObjects.indexOf(index), 1);
+            console.log("Removing");
+        } else {
+            isolatedObjects.push(index);
+            console.log("Adding");
+        }
+
+        createObjects(objects);
+    }
+
     let originalObject = document.querySelector(`.object[data-index="${index}"]`);
     if(!originalObject) return;
     clickSelection({target: originalObject});
@@ -221,4 +238,15 @@ function loadJSON() {
     localStorage.setItem("objects", JSON.stringify(JSONData.objects));
 
     location.reload();
+}
+
+function toggleIsolationMode(button) {
+    isolationModeOn = !isolationModeOn;
+    button.textContent = isolationModeOn ? "Do not isolate" : "Isolate";
+
+    // if(!isolationModeOn) {
+    //     isolatedObjects = [];
+    // }
+
+    createObjects(objects);
 }
