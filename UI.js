@@ -65,7 +65,7 @@ function updateObjectList() {
         "rectangle": "Rectangle",
         "circle": "Circle",
         "polygon": "Polygon",
-        "imageClipboard": "Image",
+        "image": "Image",
         "line": "Line",
         "text": "Text"
     };

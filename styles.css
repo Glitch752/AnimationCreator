@@ -284,6 +284,12 @@ body {
     overflow: hidden;
 }
 
+.object.image {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 .selectionBox {
     position: absolute;
     left: calc(var(--offsetX) * var(--current-scale) * 1px);

@@ -170,16 +170,20 @@ addGlobalListener("keydown", function(e) {
                 let currentTime = (parseFloat(document.getElementById("timelineMarker").style.getPropertyValue("--distance"))) / 19;
                 if(!currentTime) currentTime = 0;
 
+                let selectedObject = objects[selectedElement.dataset.index];
+
                 currentKeyframes.push({
                     time: currentTime,
                     data: {
-                        x: selectedElement.style.getPropertyValue("--offsetX"),
-                        y: selectedElement.style.getPropertyValue("--offsetY"),
-                        width: selectedElement.style.getPropertyValue("--width"),
-                        height: selectedElement.style.getPropertyValue("--height")
+                        x: selectedObject.x,
+                        y: selectedObject.y,
+                        width: selectedObject.width,
+                        height: selectedObject.height
                     },
                     timingFunction: "easeInOut"
                 });
+
+                currentKeyframes = currentKeyframes.sort((a, b) => a.time - b.time);
 
                 objects[selectedElement.dataset.index].keyframes = currentKeyframes;
 
@@ -191,15 +195,17 @@ addGlobalListener("keydown", function(e) {
         case "Backspace": {
             if(markerSelected !== null) {
                 let currentKeyframes = objects[markerSelected.object].keyframes;
-                if(currentKeyframes === undefined) currentKeyframes = "[]";
-                currentKeyframes = JSON.parse(currentKeyframes);
+                if(!currentKeyframes) return;
+
+                let oldTime = currentKeyframes[markerSelected.marker].time;
 
                 currentKeyframes.splice(markerSelected.marker, 1);
 
-                objects[markerSelected.object].keyframes = JSON.stringify(currentKeyframes);
+                objects[markerSelected.object].keyframes = currentKeyframes;
 
                 markerSelected = null;
                 updateObjectList();
+                updateElementPositions(oldTime);
             }
             break;
         }

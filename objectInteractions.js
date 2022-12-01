@@ -111,6 +111,39 @@ addGlobalListener("mousedown", (e) => {
             draggingObjectData["text"] = "";
         }
 
+        if(selectedAddObject === "imageClipboard") {
+            navigator.clipboard.read()
+                .then(data => {
+                    // Get the base64 encoded image data
+                    let imageData;
+                    for (const item of data) {
+                        for (const type of item.types) {
+                            if(type.startsWith("image/")) {
+                                imageData = item.getType(type);
+                                break;
+                            }
+                        }
+                    }
+                    // Get base64 encoded image data from the blob
+                    imageData.then(data => {
+                        // Data is a blob, convert it to a base64 string
+                        let reader = new FileReader();
+                        reader.readAsDataURL(data);
+                        reader.onloadend = function() {
+                            let base64data = reader.result;
+                            if(!base64data) imageData = null;
+        
+                            draggingObjectData["data"] = base64data;
+                            draggingObject = "image";
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                    draggingObject = "rectangle";
+                });
+        }
+
         return;
     }
 
@@ -273,6 +306,9 @@ addGlobalListener("mousemove", (e) => {
         document.documentElement.style.setProperty("--current-offset-x", offsetChangeX + "px");
         document.documentElement.style.setProperty("--current-offset-y", offsetChangeY + "px");
     } else if(draggingObject !== false) {
+        if(draggingObject === "imageClipboard") {
+            return;
+        }
         let currentTemp = document.querySelector(".object.temp");
         if(currentTemp) {
             let frame = document.getElementById("frame");
@@ -622,6 +658,8 @@ function clickSelection(e) {
 }
 
 function setSelectionPosition(selection) {
+    if(!selection) return;
+
     let selectionBox = document.getElementById("selectionBox");
 
     selectionBox.classList.add("shown");
@@ -653,7 +691,7 @@ function setSelectionPosition(selection) {
     }
 
     if(markerSelected !== null) {
-        let newKeyframes = objects[selection.dataset.index].keyframes;
+        let newKeyframes = selection.keyframes;
         if(!newKeyframes) newKeyframes = [];
 
         newKeyframes[markerSelected.marker].data = {
@@ -808,6 +846,11 @@ function createObjects(objects) {
         if(object.type === "text") {
             let textObject = frame.lastElementChild;
             textObject.innerText = object.data.text || "";
+        }
+
+        if(object.type === "image") {
+            let imageObject = frame.lastElementChild;
+            imageObject.style.setProperty("background-image", `url(${object.data.data})`);
         }
 
         for(const data in dataToProperty) {
