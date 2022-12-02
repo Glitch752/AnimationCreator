@@ -1,7 +1,8 @@
 let capturer = null;
+let exportType = null;
 
 function runExport() {
-    let exportType = document.querySelector(".select#exportType .selected")?.dataset?.exportType;
+    exportType = document.querySelector(".select#exportType .selected")?.dataset?.exportType;
     let resolutionElement = document.querySelector(".select#resolution .selected");
 
     let width = null, height = null;
@@ -321,7 +322,40 @@ function renderFrame() {
 
 function stopCapture() {
     capturer.stop();
-    capturer.save();
+    // Check if the export type is webm
+    if(exportType === "webm") {
+        // Instead of saving, get the video as a blob and send it to the server.
+        capturer.save( function( blob ) {
+            console.log("Saving WEBM");
+            let audioBlob = getAudio();
+            // Send the video to the server with an XMLHttpRequest.
+            let xhr = new XMLHttpRequest();
+            let formData = new FormData();
+            formData.append("video", blob);
+            formData.append("audio", audioBlob);
+            xhr.open("POST", "/upload");
+            xhr.send(formData);
+
+            // If we get no response or an error, simply download the video.
+            xhr.onload = function() {
+                console.log("XHR request finished.");
+                if(xhr.status !== 200) {
+                    capturer.save();
+                } else {
+                    // Turn response.data, which is a Buffer, into a blob
+                    let buffer = xhr.response;
+                    let blob = new Blob([buffer], {type: "video/webm"});
+                    
+                    // Download the blob
+                    download(blob, "animation.webm", "video/webm");
+                }
+            }
+
+            return false;
+        });
+    } else {
+        capturer.save();
+    }
 
     let canvas = document.getElementById("exportCanvas");
     canvas.remove();
@@ -396,4 +430,72 @@ function getPositionsFromKeyframes(objects, time) {
     }
 
     return objects;
+}
+
+// getAudio() returns a wav blob of the audio.
+// For now, we don't have any audio, so we just return a blob of a 3khz sine wave.
+function getAudio() {
+    // First, define our basic sine wave.
+    let sampleRate = 44100;
+    let frequency = 3000;
+    let length = duration * 60;
+    let amplitude = 0.1;
+
+    // Next, create an array of samples.
+    let samples = new Float32Array(sampleRate * length);
+    // For each sample we need, calculate the value of the sine wave.
+    for(let i = 0; i < samples.length; i++) {
+        samples[i] = amplitude * Math.sin(2 * Math.PI * frequency * i / sampleRate);
+    }
+
+    return new Blob([encodeWAV(samples, sampleRate)], {type: "audio/wav"});
+}
+
+// This function takes a Float32Array of samples and a sample rate and returns a wav file stored as a Blob.
+function encodeWAV(samples, sampleRate) {
+    let buffer = new ArrayBuffer(44 + samples.length * 2);
+    let view = new DataView(buffer);
+
+    // RIFF identifier
+    writeString(view, 0, "RIFF");
+    // file length
+    view.setUint32(4, 32 + samples.length * 2, true);
+    // RIFF type
+    writeString(view, 8, "WAVE");
+    // format chunk identifier
+    writeString(view, 12, "fmt ");
+    // format chunk length
+    view.setUint32(16, 16, true);
+    // sample format (raw)
+    view.setUint16(20, 1, true);
+    // channel count
+    view.setUint16(22, 1, true);
+    // sample rate
+    view.setUint16(24, sampleRate, true);
+    // byte rate (sample rate * block align)
+    view.setUint32(28, sampleRate * 2, true);
+    // block align (channel count * bytes per sample)
+    view.setUint16(32, 2, true);
+    // bits per sample
+    view.setUint16(34, 16, true);
+    // data chunk identifier
+    writeString(view, 36, "data");
+    // data chunk length
+    view.setUint32(40, samples.length * 2, true);
+    // write the PCM samples
+    let offset = 44;
+    for(let i = 0; i < samples.length; i++, offset += 2) {
+        let sample = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+    }
+
+    let blob = new Blob([view], {type: "audio/wav"});
+    return blob;
+}
+
+// This function writes a string to a DataView at a given offset.
+function writeString(view, offset, string) {
+    for(let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
 }
