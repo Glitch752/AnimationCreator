@@ -18,20 +18,14 @@ app.post('/upload', upload.fields([
     { name: 'audio', maxCount: 1 }
 ]), function(req, res) {
     try {
-        console.log("Processing upload");
-
         let video = req.files.video[0];
         let audio = req.files.audio[0];
 
         let videoPath = video.path;
         let audioPath = audio.path;
 
-        console.log("Video path: " + videoPath);
-        console.log("Audio path: " + audioPath);
-
         let process = new ffmpeg(videoPath);
         process.then(function (video) {
-            console.log("Video loaded");
             // Add the audio blob to the video
             video.addCommand('-i', audioPath);
             // Set quality to 100%
@@ -40,12 +34,9 @@ app.post('/upload', upload.fields([
             video.addCommand('-b:v', '8000k');
             // Get the video as a webm blob
             video.save('output.webm', function (error, file) {
-                console.log("Video saved");
                 if (!error) {
                     // Load the video as a buffer
                     let videoBuffer = fs.readFileSync(file);
-
-                    console.log("Got video buffer");
 
                     res.send(videoBuffer);
                     res.end();

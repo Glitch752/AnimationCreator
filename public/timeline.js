@@ -236,6 +236,8 @@ function updateDuration() {
 
 function updateElementPositions(time) {
     for(let i = 0; i < objects.length; i++) {
+        if(isolationModeOn && !isolatedObjects.includes(i)) continue;
+
         const object = objects[i];
         let keyframes = object.keyframes || [];
 

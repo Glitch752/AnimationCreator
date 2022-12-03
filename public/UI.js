@@ -133,10 +133,8 @@ function mouseClickObjectList(index) {
     if(isolationModeOn) {
         if(isolatedObjects.includes(index)) {
             isolatedObjects.splice(isolatedObjects.indexOf(index), 1);
-            console.log("Removing");
         } else {
             isolatedObjects.push(index);
-            console.log("Adding");
         }
 
         createObjects(objects);
