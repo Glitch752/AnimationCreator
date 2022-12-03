@@ -17,8 +17,9 @@ app.post('/upload', upload.fields([
     { name: 'video', maxCount: 1 },
     { name: 'audio', maxCount: 1 }
 ]), function(req, res) {
-    console.log("Processing upload");
     try {
+        console.log("Processing upload");
+
         let video = req.files.video[0];
         let audio = req.files.audio[0];
 
@@ -33,22 +34,30 @@ app.post('/upload', upload.fields([
             console.log("Video loaded");
             // Add the audio blob to the video
             video.addCommand('-i', audioPath);
+            // Set quality to 100%
+            video.addCommand('-crf', '0');
+            // Get the bitrate of the video
+            video.addCommand('-b:v', '8000k');
             // Get the video as a webm blob
             video.save('output.webm', function (error, file) {
                 console.log("Video saved");
                 if (!error) {
                     // Load the video as a buffer
                     let videoBuffer = fs.readFileSync(file);
-                    // Send the video blob to the client
+
+                    console.log("Got video buffer");
+
                     res.send(videoBuffer);
                     res.end();
-
-                    // Delete the video file
-                    fs.unlink(file, function(err) {
-                        if(err) console.log("Error deleting output file");
-                    });
+                } else {
+                    console.log("Error saving video: " + error);
                 }
-                
+
+                // Delete the video files
+                fs.unlink(file, function(err) {
+                    if(err) console.log("Error deleting output file");
+                });
+            
                 // Delete the video and audio files
                 fs.unlink(videoPath, function(err) {
                     if(err) console.log("Error deleting video file");
@@ -57,7 +66,7 @@ app.post('/upload', upload.fields([
                     if(err) console.log("Error deleting audio file");
                 });
             });
-        })
+        });
     } catch (e) {
         console.log(e);
         res.sendStatus(500);

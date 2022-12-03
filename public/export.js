@@ -330,6 +330,7 @@ function stopCapture() {
             let audioBlob = getAudio();
             // Send the video to the server with an XMLHttpRequest.
             let xhr = new XMLHttpRequest();
+            xhr.responseType = "blob";
             let formData = new FormData();
             formData.append("video", blob);
             formData.append("audio", audioBlob);
@@ -342,10 +343,8 @@ function stopCapture() {
                 if(xhr.status !== 200) {
                     capturer.save();
                 } else {
-                    // Turn response.data, which is a Buffer, into a blob
-                    let buffer = xhr.response;
-                    let blob = new Blob([buffer], {type: "video/webm"});
-                    
+                    let blob = xhr.response;
+
                     // Download the blob
                     download(blob, "animation.webm", "video/webm");
                 }
