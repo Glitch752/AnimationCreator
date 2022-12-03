@@ -88,8 +88,9 @@ function renderFrame() {
     for (let i = 0; i < objects.length; i++) {
         const object = objects[i];
         
-        ctx.fillStyle = object.color || "#ffffff";
-        ctx.strokeStyle = object.color || "#ffffff";
+        let color = "#" + (object.color?.replace("#", "") || "ffffff");
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color;
 
         switch(object.type) {
             default: {
