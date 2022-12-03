@@ -1,4 +1,4 @@
-// TODO: Create client-side code to combine video and audio into webm so we don't have to do it on the server
+// IF POSSIBLE: Create client-side code to combine video and audio into webm so we don't have to do it on the server
 
 // Setup basic express.js server, hosting /public folder
 var express = require('express');

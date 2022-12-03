@@ -11,6 +11,7 @@
     <script src="export.js" defer></script>
     <script src="ccapture.min.all.js" defer></script>
     <script src="timeline.js" defer></script>
+    <script src="bezier.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -106,20 +107,18 @@
                     <option value="bounceReversed">Bounce (Reversed)</option>
                     <option value="elasticReversed">Elastic (Reversed)</option>
                     <option value="step" data-custom="true" data-show-id="stepCount">Step</option>
-                    <!-- Currently creates infinite loops, temporarily disabled. -->
-                    <!-- <option value="bezier" data-custom="true" data-show-id="bezierCurve">Bezier curve</option> -->
+                    <option value="bezier" data-custom="true" data-show-id="bezierCurve">Bezier curve</option>
                 </select>
                 <div class="keyframe-timing-custom" id="stepCount">
                     <input class="keyframe-timing-input" type="number" id="stepCountInput" placeholder="Step count" onchange="changeKeyframeSteps(this)"/>
                 </div>
-                <!-- Currently creates infinite loops, temporarily disabled. -->
-                <!-- <div class="keyframe-timing-custom" id="bezierCurve">
-                    <-- TODO: Create bezier editor --
-                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput1" placeholder="X1" />
-                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput2" placeholder="Y1" />
-                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput3" placeholder="X2" />
-                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput4" placeholder="Y2" />
-                </div> -->
+                <div class="keyframe-timing-custom" id="bezierCurve">
+                    <!-- TODO: Create bezier editor -->
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput1" placeholder="X1" onChange="changeKeyframeBezier(this.value)" />
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput2" placeholder="Y1" onChange="changeKeyframeBezier(undefined, this.value)" />
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput3" placeholder="X2" onChange="changeKeyframeBezier(undefined, undefined, this.value)" />
+                    <input class="keyframe-timing-input" type="number" id="bezierCurveInput4" placeholder="Y2" onChange="changeKeyframeBezier(undefined, undefined, undefined, this.value)" />
+                </div>
             </div>
         </div>
         <div class="rightPanel">
